@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { buzz, confetti, stopColor, wrongLine } from '../lib/fun'
+import { buzz, confetti, wrongLine } from '../lib/fun'
 import { distanceM, MAX_GPS_SLACK_M, normalize } from '../lib/route'
 import { cluePoints, HINT_COST, warmth } from '../lib/score'
 import { load, reportClue, save } from '../lib/storage'
@@ -67,7 +67,6 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
   const [details, setDetails] = useState('')
 
   const node = nodes[progress.index]
-  const color = stopColor(progress.index)
   const dist = pos ? distanceM(pos, node.place) : null
   const inside = dist !== null && dist <= node.place.radiusM + Math.min(pos!.accuracy, MAX_GPS_SLACK_M)
   const heat = dist !== null ? (inside ? warmth(0, 1) : warmth(dist, node.place.radiusM)) : null
@@ -118,7 +117,7 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
   }
 
   return (
-    <main className="play" style={{ ['--stop' as string]: color.bg, ['--stop-ink' as string]: color.ink }}>
+    <main className="play">
       <RouteMap nodes={nodes} current={progress.index} pos={pos} />
 
       <header className="topbar">
@@ -127,12 +126,12 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
           <span>Clue {progress.index + 1} / {nodes.length}</span>
           <span className="dots" aria-hidden="true">
             {nodes.map((n, i) => (
-              <i key={n.id} className={i < progress.index ? 'done' : i === progress.index ? 'now' : ''} style={i <= progress.index ? { background: stopColor(i).bg } : undefined} />
+              <i key={n.id} className={i < progress.index ? 'done' : i === progress.index ? 'now' : ''} />
             ))}
           </span>
         </div>
         <div className="score-pill" aria-label={`${totalScore(progress)} points`}>
-          <span aria-hidden="true">★</span> <b data-testid="score">{score}</b>
+          <span className="star" aria-hidden="true">★</span><b data-testid="score">{score}</b>
         </div>
       </header>
 

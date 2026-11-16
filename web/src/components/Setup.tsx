@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { buildRoute, routeKm } from '../lib/route'
 import { maxScore } from '../lib/score'
 import type { Hunt, Pace, Settings } from '../types'
+import { RouteSketch } from './RouteSketch'
 
 // The core story needs ~80 min. Shorter options come once the hunt has more optional nodes.
 const BUDGETS: { min: number; label: string }[] = [
@@ -16,7 +17,7 @@ const PACES: { id: Pace; label: string }[] = [
 
 function formatMinutes(m: number) {
   const h = Math.floor(m / 60)
-  return h ? `${h}h${String(m % 60).padStart(2, '0')}` : `${m}m`
+  return h ? `${h}h ${String(m % 60).padStart(2, '0')}` : `${m} min`
 }
 
 export function Setup({ hunt, onStart }: { hunt: Hunt; onStart: (s: Settings, nodeIds: string[]) => void }) {
@@ -26,41 +27,45 @@ export function Setup({ hunt, onStart }: { hunt: Hunt; onStart: (s: Settings, no
 
   return (
     <main className="setup">
-      <header className="hero">
-        <div className="shapes" aria-hidden="true">
-          <i className="s-sun" />
-          <i className="s-arch" />
-          <i className="s-square" />
-          <i className="s-dot" />
-        </div>
-        <span className="chip">{hunt.city} · City Quest</span>
+      <nav className="brand">
+        <span className="logo" aria-hidden="true" />
+        City Quest <span>· {hunt.city}</span>
+      </nav>
+
+      <header className="intro-head">
         <h1>{hunt.title}</h1>
-        <p className="tagline">{hunt.tagline}</p>
+        <p className="tagline">A treasure hunt through the heart of {hunt.city}</p>
       </header>
 
-      <div className="stickers" aria-label="Route at a glance">
-        <span className="sticker s1"><b>{route.nodes.length}</b> stops</span>
-        <span className="sticker s2"><b>{routeKm(route.nodes).toFixed(1)}</b> km</span>
-        <span className="sticker s3"><b>{formatMinutes(route.minutes)}</b></span>
-        <span className="sticker s4"><b>{maxScore(route.nodes.length)}</b> pts to win</span>
-      </div>
+      <figure className="sketch-card">
+        <RouteSketch nodes={route.nodes} />
+        <dl className="facts">
+          <div><dt>Stops</dt><dd>{route.nodes.length}</dd></div>
+          <div><dt>Walk</dt><dd>{routeKm(route.nodes).toFixed(1)} km</dd></div>
+          <div><dt>Time</dt><dd>{formatMinutes(route.minutes)}</dd></div>
+          <div><dt>Points</dt><dd className="pop">{maxScore(route.nodes.length).toLocaleString('en')}</dd></div>
+        </dl>
+      </figure>
 
-      <section className="how">
-        <div><span className="how-n n1">1</span><b>Walk</b><small>Follow the story to each stop</small></div>
-        <div><span className="how-n n2">2</span><b>Look</b><small>The answer is only visible on the spot</small></div>
-        <div><span className="how-n n3">3</span><b>Collect</b><small>Earn points and a stamp per stop</small></div>
+      <section className="steps">
+        <h2 className="label">How it works</h2>
+        <ol>
+          <li><b>Walk</b> to each stop. The story tells you where.</li>
+          <li><b>Look</b> closely. Every answer is only visible on the spot.</li>
+          <li><b>Collect</b> points and a stamp for each place you crack.</li>
+        </ol>
       </section>
 
       <section className="story">
-        <span className="label">The story</span>
+        <h2 className="label">The story</h2>
         <p>{hunt.intro}</p>
       </section>
 
       <section className="plan">
-        <h2>Plan your route</h2>
+        <h2 className="label">Your route</h2>
 
         <div className="field">
-          <span className="label" id="time-label">Time you have</span>
+          <span id="time-label">Time you have</span>
           <div className="segmented" role="group" aria-labelledby="time-label">
             {BUDGETS.map((b) => (
               <button key={b.min} className={b.min === settings.budgetMin ? 'on' : ''} aria-pressed={b.min === settings.budgetMin} onClick={() => set({ budgetMin: b.min })}>
@@ -71,7 +76,7 @@ export function Setup({ hunt, onStart }: { hunt: Hunt; onStart: (s: Settings, no
         </div>
 
         <div className="field">
-          <span className="label" id="pace-label">Walking pace</span>
+          <span id="pace-label">Walking pace</span>
           <div className="segmented" role="group" aria-labelledby="pace-label">
             {PACES.map((p) => (
               <button key={p.id} className={p.id === settings.pace ? 'on' : ''} aria-pressed={p.id === settings.pace} onClick={() => set({ pace: p.id })}>
