@@ -2,10 +2,11 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo, useState } from 'react'
 import { AttributionControl, Circle, MapContainer, Marker, Polyline, TileLayer, useMap } from 'react-leaflet'
+import { stopColor } from '../lib/fun'
 import type { Position } from '../lib/useGeolocation'
 import type { ClueNode } from '../types'
 
-const ACCENT = '#2f4bff'
+const TRAIL = '#7a7f99'
 
 // CARTO basemaps: clean, low-detail styles that keep the pins readable.
 // Free tier is for low-volume use; move to a paid/self-hosted style before launch.
@@ -39,14 +40,15 @@ function FollowTarget({ target }: { target: ClueNode }) {
   return null
 }
 
-const doneIcon = L.divIcon({ className: '', html: '<div class="pin-done">✓</div>', iconSize: [22, 22], iconAnchor: [11, 11] })
+const doneIcon = (i: number) =>
+  L.divIcon({ className: '', html: `<div class="pin-done" style="background:${stopColor(i).bg};color:${stopColor(i).ink}">✓</div>`, iconSize: [24, 24], iconAnchor: [12, 12] })
 const meIcon = L.divIcon({ className: '', html: '<div class="me"></div>', iconSize: [20, 20], iconAnchor: [10, 10] })
 
 export function RouteMap({ nodes, current, pos }: { nodes: ClueNode[]; current: number; pos: Position | null }) {
   const target = nodes[current]
   const dark = usePrefersDark()
   const currentIcon = useMemo(
-    () => L.divIcon({ className: '', html: `<div class="pin"><b>${current + 1}</b></div>`, iconSize: [40, 40], iconAnchor: [20, 46] }),
+    () => L.divIcon({ className: '', html: `<div class="pin" style="background:${stopColor(current).bg}"><b style="color:${stopColor(current).ink}">${current + 1}</b></div>`, iconSize: [40, 40], iconAnchor: [20, 46] }),
     [current],
   )
 
@@ -62,16 +64,16 @@ export function RouteMap({ nodes, current, pos }: { nodes: ClueNode[]; current: 
       />
       <Polyline
         positions={nodes.slice(0, current + 1).map((n): [number, number] => [n.place.lat, n.place.lng])}
-        pathOptions={{ color: ACCENT, weight: 4, opacity: 0.7, dashArray: '1 10', lineCap: 'round' }}
+        pathOptions={{ color: TRAIL, weight: 4, opacity: 0.55, dashArray: '1 10', lineCap: 'round' }}
       />
       <Circle
         center={[target.place.lat, target.place.lng]}
         radius={target.place.radiusM}
-        pathOptions={{ color: ACCENT, fillColor: ACCENT, fillOpacity: 0.1, weight: 1.5, dashArray: '4 6' }}
+        pathOptions={{ color: stopColor(current).bg, fillColor: stopColor(current).bg, fillOpacity: 0.14, weight: 2, dashArray: '4 6' }}
       />
       {/* Upcoming stops stay hidden: finding them is part of the game. */}
-      {nodes.slice(0, current).map((n) => (
-        <Marker key={n.id} position={[n.place.lat, n.place.lng]} icon={doneIcon} title={n.place.name} />
+      {nodes.slice(0, current).map((n, i) => (
+        <Marker key={n.id} position={[n.place.lat, n.place.lng]} icon={doneIcon(i)} title={n.place.name} />
       ))}
       <Marker position={[target.place.lat, target.place.lng]} icon={currentIcon} title="Next clue" />
       {pos && (

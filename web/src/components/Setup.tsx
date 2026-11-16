@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { buildRoute, routeKm } from '../lib/route'
+import { maxScore } from '../lib/score'
 import type { Hunt, Pace, Settings } from '../types'
 
 // The core story needs ~80 min. Shorter options come once the hunt has more optional nodes.
@@ -15,7 +16,7 @@ const PACES: { id: Pace; label: string }[] = [
 
 function formatMinutes(m: number) {
   const h = Math.floor(m / 60)
-  return h ? `${h} h ${String(m % 60).padStart(2, '0')}` : `${m} min`
+  return h ? `${h}h${String(m % 60).padStart(2, '0')}` : `${m}m`
 }
 
 export function Setup({ hunt, onStart }: { hunt: Hunt; onStart: (s: Settings, nodeIds: string[]) => void }) {
@@ -26,15 +27,29 @@ export function Setup({ hunt, onStart }: { hunt: Hunt; onStart: (s: Settings, no
   return (
     <main className="setup">
       <header className="hero">
+        <div className="shapes" aria-hidden="true">
+          <i className="s-sun" />
+          <i className="s-arch" />
+          <i className="s-square" />
+          <i className="s-dot" />
+        </div>
         <span className="chip">{hunt.city} · City Quest</span>
         <h1>{hunt.title}</h1>
         <p className="tagline">{hunt.tagline}</p>
-        <div className="hero-stats">
-          <div><strong>{route.nodes.length}</strong><span>stops</span></div>
-          <div><strong>{routeKm(route.nodes).toFixed(1)}</strong><span>km walk</span></div>
-          <div><strong>{formatMinutes(route.minutes)}</strong><span>total</span></div>
-        </div>
       </header>
+
+      <div className="stickers" aria-label="Route at a glance">
+        <span className="sticker s1"><b>{route.nodes.length}</b> stops</span>
+        <span className="sticker s2"><b>{routeKm(route.nodes).toFixed(1)}</b> km</span>
+        <span className="sticker s3"><b>{formatMinutes(route.minutes)}</b></span>
+        <span className="sticker s4"><b>{maxScore(route.nodes.length)}</b> pts to win</span>
+      </div>
+
+      <section className="how">
+        <div><span className="how-n n1">1</span><b>Walk</b><small>Follow the story to each stop</small></div>
+        <div><span className="how-n n2">2</span><b>Look</b><small>The answer is only visible on the spot</small></div>
+        <div><span className="how-n n3">3</span><b>Collect</b><small>Earn points and a stamp per stop</small></div>
+      </section>
 
       <section className="story">
         <span className="label">The story</span>

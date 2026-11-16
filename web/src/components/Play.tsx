@@ -1,18 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { buzz, confetti, stopColor, wrongLine } from '../lib/fun'
 import { distanceM, MAX_GPS_SLACK_M, normalize } from '../lib/route'
+import { cluePoints, HINT_COST, warmth } from '../lib/score'
 import { load, reportClue, save } from '../lib/storage'
 import { useGeolocation, type Position } from '../lib/useGeolocation'
 import type { ClueNode, Hunt } from '../types'
 import { Modal } from './Modal'
 import { RouteMap } from './RouteMap'
-
-export type Phase = 'travel' | 'question' | 'solved'
-
-export interface Progress {
-  index: number
-  phase: Phase
-  hintsUsed: number
-}
+import { Stamp } from './Stamp'
+import { totalScore, type Progress } from '../lib/progress'
 
 interface Props {
   hunt: Hunt
@@ -36,6 +32,26 @@ function readTestMode(): boolean {
   return load('cq.testMode', false)
 }
 
+/** Counts up to `value` when it changes. */
+function useCountUp(value: number) {
+  const [shown, setShown] = useState(value)
+  const from = useRef(value)
+  useEffect(() => {
+    const start = performance.now()
+    const a = from.current
+    let raf = 0
+    const tick = (t: number) => {
+      const k = Math.min(1, (t - start) / 700)
+      setShown(Math.round(a + (value - a) * (1 - (1 - k) ** 3)))
+      if (k < 1) raf = requestAnimationFrame(tick)
+      else from.current = value
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [value])
+  return shown
+}
+
 export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
   const gps = useGeolocation()
   const [testMode] = useState(readTestMode)
@@ -45,35 +61,49 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
 
   const [answer, setAnswer] = useState('')
   const [wrong, setWrong] = useState<string | null>(null)
-  const [showHint, setShowHint] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const [dialog, setDialog] = useState<'leave' | 'report' | null>(null)
   const [reason, setReason] = useState<string | null>(null)
   const [details, setDetails] = useState('')
 
   const node = nodes[progress.index]
+  const color = stopColor(progress.index)
   const dist = pos ? distanceM(pos, node.place) : null
   const inside = dist !== null && dist <= node.place.radiusM + Math.min(pos!.accuracy, MAX_GPS_SLACK_M)
+  const heat = dist !== null ? (inside ? warmth(0, 1) : warmth(dist, node.place.radiusM)) : null
   const isLast = progress.index === nodes.length - 1
+  const score = useCountUp(totalScore(progress))
+  const earned = progress.earned[node.id]
 
   const go = (patch: Partial<Progress>) => onProgress({ ...progress, ...patch })
+
+  // A small buzz the moment you arrive.
+  const wasInside = useRef(false)
+  useEffect(() => {
+    if (inside && !wasInside.current && progress.phase === 'travel') buzz(60)
+    wasInside.current = inside
+  }, [inside, progress.phase])
 
   const check = (value: string) => {
     const q = node.question
     const ok = q.kind === 'choice' ? value === q.answer : q.answers.some((a) => normalize(a) === normalize(value))
     if (ok) {
       setWrong(null)
-      go({ phase: 'solved' })
+      const result = cluePoints({ wrongs: progress.wrongs, hinted: progress.hinted })
+      go({ phase: 'solved', earned: { ...progress.earned, [node.id]: result } })
+      confetti()
+      buzz([30, 40, 30])
     } else {
       setWrong(value)
+      buzz(120)
+      go({ wrongs: progress.wrongs + 1 })
     }
   }
 
   const next = () => {
     setAnswer('')
-    setShowHint(false)
     setWrong(null)
-    go({ index: progress.index + 1, phase: 'travel' })
+    go({ index: progress.index + 1, phase: 'travel', wrongs: 0, hinted: false })
   }
 
   const sendReport = () => {
@@ -88,7 +118,7 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
   }
 
   return (
-    <main className="play">
+    <main className="play" style={{ ['--stop' as string]: color.bg, ['--stop-ink' as string]: color.ink }}>
       <RouteMap nodes={nodes} current={progress.index} pos={pos} />
 
       <header className="topbar">
@@ -97,9 +127,12 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
           <span>Clue {progress.index + 1} / {nodes.length}</span>
           <span className="dots" aria-hidden="true">
             {nodes.map((n, i) => (
-              <i key={n.id} className={i < progress.index ? 'done' : i === progress.index ? 'now' : ''} />
+              <i key={n.id} className={i < progress.index ? 'done' : i === progress.index ? 'now' : ''} style={i <= progress.index ? { background: stopColor(i).bg } : undefined} />
             ))}
           </span>
+        </div>
+        <div className="score-pill" aria-label={`${totalScore(progress)} points`}>
+          <span aria-hidden="true">★</span> <b data-testid="score">{score}</b>
         </div>
       </header>
 
@@ -116,21 +149,21 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
           <>
             <p className="lead">{node.lead}</p>
             <div className={inside ? 'geo here' : 'geo'}>
-              <span className="ring" aria-hidden="true">{inside ? '✓' : '➜'}</span>
-              <div>
-                {inside ? (
-                  <strong>You’re here!</strong>
-                ) : dist !== null ? (
-                  <>
+              <div className="geo-row">
+                <div>
+                  {inside ? (
+                    <strong>You’re here!</strong>
+                  ) : dist !== null ? (
                     <strong>{formatDistance(dist)} away</strong>
-                    <span>Walk to the circle on the map</span>
-                  </>
-                ) : (
-                  <>
+                  ) : (
                     <strong>Finding you…</strong>
-                    <span>{error ?? 'Allow location to track your walk'}</span>
-                  </>
-                )}
+                  )}
+                  <span>{inside ? 'Open the clue and look around' : dist !== null ? 'Walk to the circle on the map' : error ?? 'Allow location to track your walk'}</span>
+                </div>
+                {heat && <span className={`heat ${inside ? 'heat-found' : `heat-${heat.label.toLowerCase()}`}`}>{inside ? 'Found it' : heat.label}</span>}
+              </div>
+              <div className="meter" aria-hidden="true" style={{ ['--fill' as string]: `${(heat?.level ?? 0.03) * 100}%` }}>
+                <span />
               </div>
             </div>
             <button className="primary" disabled={!inside} onClick={() => go({ phase: 'question' })}>
@@ -171,27 +204,28 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
                 <button className="primary" type="submit">Check</button>
               </form>
             )}
-            {wrong !== null && <p className="warn">Not quite. Look again.</p>}
-            {showHint ? (
+            {wrong !== null && <p className="warn" role="status">{wrongLine(progress.wrongs - 1)}</p>}
+            {progress.hinted ? (
               <p className="hint"><span aria-hidden="true">💡</span>{node.hint}</p>
             ) : (
-              <button
-                className="link"
-                onClick={() => {
-                  setShowHint(true)
-                  go({ hintsUsed: progress.hintsUsed + 1 })
-                }}
-              >
-                Need a hint?
+              <button className="link hint-btn" onClick={() => go({ hinted: true, hintsUsed: progress.hintsUsed + 1 })}>
+                Need a hint? <small>−{HINT_COST} pts</small>
               </button>
             )}
           </>
         )}
 
-        {progress.phase === 'solved' && (
+        {progress.phase === 'solved' && earned && (
           <div className="success">
-            <span className="tick" aria-hidden="true">✓</span>
-            <p className="reveal"><b>Solved.</b> {node.reveal}</p>
+            <div className="success-top">
+              <Stamp node={node} index={progress.index} perfect={earned.perfect} size={104} />
+              <div>
+                <span className="points-pop">+{earned.points}</span>
+                <strong className="success-title">{earned.perfect ? 'Perfect!' : 'Solved!'}</strong>
+                <span className="success-sub">Stamp collected</span>
+              </div>
+            </div>
+            <p className="reveal">{node.reveal}</p>
             <button className="primary" onClick={isLast ? () => go({ index: nodes.length }) : next}>
               {isLast ? 'Finish the hunt' : 'Next clue →'}
             </button>
@@ -203,7 +237,7 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
 
       {dialog === 'leave' && (
         <Modal title="Leave this hunt?" onClose={() => setDialog(null)}>
-          <p>Your progress on this phone will be lost.</p>
+          <p>Your progress and points on this phone will be lost.</p>
           <div className="actions">
             <button className="primary danger" onClick={onQuit}>Yes, leave</button>
             <button className="secondary" onClick={() => setDialog(null)}>Keep playing</button>

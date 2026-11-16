@@ -58,13 +58,14 @@ test('plays the full 2-hour hunt from Sol to Templo de Debod', async ({ page }) 
       // A wrong answer is rejected, then a hint is used.
       const wrong = n.question.kind === 'choice' ? n.question.options.find((o) => o !== correct(n))! : 'nope'
       await answer(page, n, wrong)
-      await expect(page.getByText('Not quite. Look again.')).toBeVisible()
+      await expect(page.getByText(/^Not quite\./)).toBeVisible()
       await page.getByRole('button', { name: 'Need a hint?' }).click()
       await expect(page.getByText(n.hint)).toBeVisible()
     }
 
     await answer(page, n, correct(n))
     await expect(page.locator('.reveal')).toContainText(n.reveal.slice(0, 30))
+    await expect(page.getByText(i === 1 ? 'Solved!' : 'Perfect!')).toBeVisible()
     await expect(page.getByRole('dialog')).toHaveCount(0)
     const last = i === nodes.length - 1
     await page.getByRole('button', { name: last ? 'Finish the hunt' : 'Next clue' }).click()
@@ -72,7 +73,12 @@ test('plays the full 2-hour hunt from Sol to Templo de Debod', async ({ page }) 
 
   await expect(page.getByText('Hunt complete')).toBeVisible()
   await expect(page.locator('.stats')).toContainText(`${nodes.length}clues solved`)
+  await expect(page.locator('.stats')).toContainText(`${nodes.length - 1}perfect`)
   await expect(page.locator('.stats')).toContainText('1hints used')
+  // 7 perfect clues (150) + clue 2 with one wrong answer and a hint (100 - 20 - 40).
+  await expect(page.getByTestId('final-score')).toHaveText(String(7 * 150 + 40))
+  await expect(page.getByRole('heading', { name: 'Master Cartographer' })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Stamp:/ })).toHaveCount(nodes.length)
   await page.getByRole('button', { name: 'Back to start' }).click()
   await expect(page.getByRole('button', { name: 'Start the hunt' })).toBeVisible()
   expect(errors).toEqual([])
@@ -136,8 +142,10 @@ test('resumes where you left off after closing the page', async ({ page }) => {
   await page.getByRole('button', { name: 'Next clue' }).click()
   await expect(page.getByText('Clue 2 /')).toBeVisible()
 
+  await expect(page.getByTestId('score')).toHaveText('150')
   await page.reload()
   await expect(page.getByText('Clue 2 /')).toBeVisible()
+  await expect(page.getByTestId('score')).toHaveText('150')
   await expect(page.getByRole('heading', { name: nodes[1].title })).toBeVisible()
 })
 
