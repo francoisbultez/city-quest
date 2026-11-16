@@ -40,10 +40,11 @@ export default function App() {
 
   if (session.progress.index >= nodes.length) {
     return (
-      <main className="screen done">
-        <p className="eyebrow">Hunt complete</p>
+      <main className="finish">
+        <div className="medal" aria-hidden="true">☀</div>
+        <span className="label eyebrow">Hunt complete</span>
         <h1>{hunt.title}</h1>
-        <p className="intro">{hunt.outro}</p>
+        <p className="outro">{hunt.outro}</p>
         <div className="stats">
           <div><strong>{nodes.length}</strong><span>clues solved</span></div>
           <div><strong>{session.progress.hintsUsed}</strong><span>hints used</span></div>
@@ -59,9 +60,7 @@ export default function App() {
       nodes={nodes}
       progress={session.progress}
       onProgress={(progress) => update({ ...session, progress })}
-      onQuit={() => {
-        if (window.confirm('Leave this hunt? Your progress will be lost.')) update(null)
-      }}
+      onQuit={() => update(null)}
     />
   )
 }

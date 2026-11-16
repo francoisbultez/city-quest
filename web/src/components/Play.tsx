@@ -3,6 +3,7 @@ import { distanceM, MAX_GPS_SLACK_M, normalize } from '../lib/route'
 import { load, reportClue, save } from '../lib/storage'
 import { useGeolocation, type Position } from '../lib/useGeolocation'
 import type { ClueNode, Hunt } from '../types'
+import { Modal } from './Modal'
 import { RouteMap } from './RouteMap'
 
 export type Phase = 'travel' | 'question' | 'solved'
@@ -21,6 +22,9 @@ interface Props {
   onQuit: () => void
 }
 
+const REASONS = ['Can’t find it', 'Answer looks wrong', 'Covered or closed', 'Other']
+const KEYS = 'ABCDEF'
+
 function formatDistance(m: number) {
   return m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1)} km`
 }
@@ -38,10 +42,14 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
   const [fakePos, setFakePos] = useState<Position | null>(null)
   const pos = fakePos ?? gps.pos
   const error = gps.error
+
   const [answer, setAnswer] = useState('')
-  const [wrong, setWrong] = useState(false)
+  const [wrong, setWrong] = useState<string | null>(null)
   const [showHint, setShowHint] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [dialog, setDialog] = useState<'leave' | 'report' | null>(null)
+  const [reason, setReason] = useState<string | null>(null)
+  const [details, setDetails] = useState('')
 
   const node = nodes[progress.index]
   const dist = pos ? distanceM(pos, node.place) : null
@@ -52,57 +60,78 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
 
   const check = (value: string) => {
     const q = node.question
-    const ok =
-      q.kind === 'choice' ? value === q.answer : q.answers.some((a) => normalize(a) === normalize(value))
+    const ok = q.kind === 'choice' ? value === q.answer : q.answers.some((a) => normalize(a) === normalize(value))
     if (ok) {
-      setWrong(false)
+      setWrong(null)
       go({ phase: 'solved' })
     } else {
-      setWrong(true)
+      setWrong(value)
     }
   }
 
   const next = () => {
     setAnswer('')
     setShowHint(false)
-    setWrong(false)
+    setWrong(null)
     go({ index: progress.index + 1, phase: 'travel' })
   }
 
-  const report = () => {
-    const reason = window.prompt('What is wrong with this clue? (e.g. statue covered, plaque missing)')
-    if (!reason) return
-    reportClue({ huntId: hunt.id, nodeId: node.id, reason, at: new Date().toISOString() })
-    setToast('Thanks! Your report is saved on this phone and will be sent once we have a server.')
-    setTimeout(() => setToast(null), 3500)
+  const sendReport = () => {
+    const text = [reason, details.trim()].filter(Boolean).join(': ')
+    if (!text) return
+    reportClue({ huntId: hunt.id, nodeId: node.id, reason: text, at: new Date().toISOString() })
+    setDialog(null)
+    setReason(null)
+    setDetails('')
+    setToast('Thanks! Report saved on this phone.')
+    setTimeout(() => setToast(null), 3000)
   }
 
   return (
-    <main className="screen play">
+    <main className="play">
       <RouteMap nodes={nodes} current={progress.index} pos={pos} />
 
       <header className="topbar">
-        <button className="ghost" onClick={onQuit} aria-label="Leave hunt">✕</button>
-        <span>
-          Clue {progress.index + 1} / {nodes.length}
-        </span>
-        <span className="progress">
-          <span style={{ width: `${(progress.index / nodes.length) * 100}%` }} />
-        </span>
+        <button className="icon-btn" onClick={() => setDialog('leave')} aria-label="Leave hunt">✕</button>
+        <div className="step-pill">
+          <span>Clue {progress.index + 1} / {nodes.length}</span>
+          <span className="dots" aria-hidden="true">
+            {nodes.map((n, i) => (
+              <i key={n.id} className={i < progress.index ? 'done' : i === progress.index ? 'now' : ''} />
+            ))}
+          </span>
+        </div>
       </header>
 
-      <section className="sheet">
+      <section className="sheet" key={`${node.id}-${progress.phase}`}>
         <div className="sheet-head">
+          <div className="meta">
+            <span className="stop-no">Stop {progress.index + 1}</span>
+            {node.verification.status === 'draft' && <span className="badge">Not verified on site yet</span>}
+          </div>
           <h2>{node.title}</h2>
-          {node.verification.status === 'draft' && <span className="badge">Not verified on site yet</span>}
         </div>
 
         {progress.phase === 'travel' && (
           <>
             <p className="lead">{node.lead}</p>
-            <div className="geo">
-              {error && !pos && <span>{error}</span>}
-              {dist !== null && (inside ? <strong>You’re here!</strong> : <span>{formatDistance(dist)} away</span>)}
+            <div className={inside ? 'geo here' : 'geo'}>
+              <span className="ring" aria-hidden="true">{inside ? '✓' : '➜'}</span>
+              <div>
+                {inside ? (
+                  <strong>You’re here!</strong>
+                ) : dist !== null ? (
+                  <>
+                    <strong>{formatDistance(dist)} away</strong>
+                    <span>Walk to the circle on the map</span>
+                  </>
+                ) : (
+                  <>
+                    <strong>Finding you…</strong>
+                    <span>{error ?? 'Allow location to track your walk'}</span>
+                  </>
+                )}
+              </div>
             </div>
             <button className="primary" disabled={!inside} onClick={() => go({ phase: 'question' })}>
               {inside ? 'Open the clue' : 'Get closer to open the clue'}
@@ -111,10 +140,7 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
               GPS not working? I’m there
             </button>
             {testMode && (
-              <button
-                className="test-btn"
-                onClick={() => setFakePos({ lat: node.place.lat, lng: node.place.lng, accuracy: 5 })}
-              >
+              <button className="test-btn" onClick={() => setFakePos({ lat: node.place.lat, lng: node.place.lng, accuracy: 5 })}>
                 🧪 Teleport to this stop
               </button>
             )}
@@ -126,8 +152,9 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
             <p className="prompt">{node.question.prompt}</p>
             {node.question.kind === 'choice' ? (
               <div className="options">
-                {node.question.options.map((o) => (
-                  <button key={o} className="option" onClick={() => check(o)}>
+                {node.question.options.map((o, i) => (
+                  <button key={o} className={wrong === o ? 'option shake' : 'option'} onClick={() => check(o)}>
+                    <span className="key" aria-hidden="true">{KEYS[i]}</span>
                     {o}
                   </button>
                 ))}
@@ -140,13 +167,13 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
                   check(answer)
                 }}
               >
-                <input value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Your answer" autoFocus />
+                <input id="answer" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Your answer" autoFocus autoComplete="off" />
                 <button className="primary" type="submit">Check</button>
               </form>
             )}
-            {wrong && <p className="warn">Not quite. Look again.</p>}
+            {wrong !== null && <p className="warn">Not quite. Look again.</p>}
             {showHint ? (
-              <p className="hint">💡 {node.hint}</p>
+              <p className="hint"><span aria-hidden="true">💡</span>{node.hint}</p>
             ) : (
               <button
                 className="link"
@@ -162,18 +189,46 @@ export function Play({ hunt, nodes, progress, onProgress, onQuit }: Props) {
         )}
 
         {progress.phase === 'solved' && (
-          <>
-            <p className="reveal">✓ {node.reveal}</p>
+          <div className="success">
+            <span className="tick" aria-hidden="true">✓</span>
+            <p className="reveal"><b>Solved.</b> {node.reveal}</p>
             <button className="primary" onClick={isLast ? () => go({ index: nodes.length }) : next}>
-              {isLast ? 'Finish the hunt' : 'Next clue'}
+              {isLast ? 'Finish the hunt' : 'Next clue →'}
             </button>
-          </>
+          </div>
         )}
 
-        <button className="link subtle" onClick={report}>Report a problem with this clue</button>
+        <button className="link subtle" onClick={() => setDialog('report')}>Report a problem with this clue</button>
       </section>
 
-      {toast && <div className="toast">{toast}</div>}
+      {dialog === 'leave' && (
+        <Modal title="Leave this hunt?" onClose={() => setDialog(null)}>
+          <p>Your progress on this phone will be lost.</p>
+          <div className="actions">
+            <button className="primary danger" onClick={onQuit}>Yes, leave</button>
+            <button className="secondary" onClick={() => setDialog(null)}>Keep playing</button>
+          </div>
+        </Modal>
+      )}
+
+      {dialog === 'report' && (
+        <Modal title="What’s wrong with this clue?" onClose={() => setDialog(null)}>
+          <div className="reasons">
+            {REASONS.map((r) => (
+              <button key={r} className={reason === r ? 'on' : ''} aria-pressed={reason === r} onClick={() => setReason(reason === r ? null : r)}>
+                {r}
+              </button>
+            ))}
+          </div>
+          <textarea id="report-details" placeholder="Details (optional), e.g. the plaque is covered by a stage" value={details} onChange={(e) => setDetails(e.target.value)} />
+          <div className="actions">
+            <button className="primary" disabled={!reason && !details.trim()} onClick={sendReport}>Send report</button>
+            <button className="secondary" onClick={() => setDialog(null)}>Cancel</button>
+          </div>
+        </Modal>
+      )}
+
+      {toast && <div className="toast" role="status">{toast}</div>}
     </main>
   )
 }

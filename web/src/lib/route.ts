@@ -68,3 +68,10 @@ export function normalize(s: string): string {
     .replace(/\s+/g, ' ')
     .trim()
 }
+
+/** Walking distance of a route in km, street detour included. */
+export function routeKm(nodes: ClueNode[]): number {
+  let m = 0
+  for (let i = 1; i < nodes.length; i++) m += distanceM(nodes[i - 1].place, nodes[i].place)
+  return (m * DETOUR) / 1000
+}

@@ -65,6 +65,7 @@ test('plays the full 2-hour hunt from Sol to Templo de Debod', async ({ page }) 
 
     await answer(page, n, correct(n))
     await expect(page.locator('.reveal')).toContainText(n.reveal.slice(0, 30))
+    await expect(page.getByRole('dialog')).toHaveCount(0)
     const last = i === nodes.length - 1
     await page.getByRole('button', { name: last ? 'Finish the hunt' : 'Next clue' }).click()
   }
@@ -144,23 +145,29 @@ test('leaving the hunt asks first, then resets', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start the hunt' }).click()
 
-  page.once('dialog', (d) => d.dismiss())
   await page.getByRole('button', { name: 'Leave hunt' }).click()
+  await expect(page.getByRole('dialog', { name: 'Leave this hunt?' })).toBeVisible()
+  await page.getByRole('button', { name: 'Keep playing' }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.getByText('Clue 1 /')).toBeVisible()
 
-  page.once('dialog', (d) => d.accept())
   await page.getByRole('button', { name: 'Leave hunt' }).click()
+  await page.getByRole('button', { name: 'Yes, leave' }).click()
   await expect(page.getByRole('button', { name: 'Start the hunt' })).toBeVisible()
 })
 
 test('saves broken-clue reports on the device', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start the hunt' }).click()
-  page.once('dialog', (d) => d.accept('Plaque covered by a stage'))
   await page.getByRole('button', { name: 'Report a problem with this clue' }).click()
+  const send = page.getByRole('button', { name: 'Send report' })
+  await expect(send).toBeDisabled() // nothing chosen yet
+  await page.getByRole('button', { name: 'Covered or closed' }).click()
+  await page.getByPlaceholder(/Details/).fill('Plaque covered by a stage')
+  await send.click()
   await expect(page.locator('.toast')).toContainText('Thanks!')
   const reports = await page.evaluate(() => JSON.parse(localStorage.getItem('cq.reports') ?? '[]'))
-  expect(reports).toMatchObject([{ huntId: 'madrid-bear', nodeId: 'km0', reason: 'Plaque covered by a stage' }])
+  expect(reports).toMatchObject([{ huntId: 'madrid-bear', nodeId: 'km0', reason: 'Covered or closed: Plaque covered by a stage' }])
 })
 
 test('test mode lets you teleport to each stop', async ({ page, context }) => {
