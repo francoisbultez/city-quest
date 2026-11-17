@@ -1,7 +1,7 @@
-import type { StopResult } from './game'
+import { CHECK_BONUS, totalPoints, type StopResult } from './game'
 import { load, save } from './storage'
 
-export type Screen = 'home' | 'walk' | 'quiz' | 'correct' | 'end'
+export type Screen = 'home' | 'walk' | 'quiz' | 'lesson' | 'end'
 
 export interface Session {
   routeId: string
@@ -11,6 +11,10 @@ export interface Session {
   wrongs: number
   hinted: boolean
   results: StopResult[]
+  /** Quick-check option picked per stop id. */
+  checks: Record<string, string>
+  /** "Look closer" items ticked, as "stopId:index". */
+  spotted: string[]
   startedAt: number
   finishedAt?: number
 }
@@ -33,10 +37,18 @@ export const newSession = (routeId: string): Session => ({
   wrongs: 0,
   hinted: false,
   results: [],
+  checks: {},
+  spotted: [],
   startedAt: Date.now(),
 })
 
-export const loadSession = () => load<Session | null>(SESSION_KEY, null)
+/** Sessions saved by older versions lack the lesson fields. */
+export function loadSession(): Session | null {
+  const s = load<Session | null>(SESSION_KEY, null)
+  if (!s) return null
+  if (!['home', 'walk', 'quiz', 'lesson', 'end'].includes(s.screen)) s.screen = 'lesson'
+  return { ...s, checks: s.checks ?? {}, spotted: s.spotted ?? [] }
+}
 export const saveSession = (s: Session | null) => save(SESSION_KEY, s)
 
 export const loadBadges = () => load<EarnedBadge[]>(BADGES_KEY, [])
@@ -49,4 +61,10 @@ export function awardBadge(b: EarnedBadge): EarnedBadge[] {
   const list = [...others, best]
   save(BADGES_KEY, list)
   return list
+}
+
+/** Quiz points plus quick-check bonuses. */
+export function sessionPoints(s: Session, answers: Record<string, string>): number {
+  const bonus = Object.entries(s.checks).filter(([id, picked]) => answers[id] === picked).length * CHECK_BONUS
+  return totalPoints(s.results) + bonus
 }

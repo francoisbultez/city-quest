@@ -2,6 +2,8 @@ export const POINTS_PER_STOP = 100
 export const HINT_COST = 40
 export const WRONG_COST = 20
 export const MIN_POINTS = 20
+/** Bonus for answering a lesson's quick check correctly. */
+export const CHECK_BONUS = 10
 
 export function maxPoints(stops: number): number {
   return stops * POINTS_PER_STOP

@@ -16,7 +16,7 @@ describe.each(routes)('route $id', (route) => {
   })
 
   it.each(route.stops.map((s) => [s.id, s] as const))('%s: has all the texts the screens need', (_, s) => {
-    for (const field of ['riddle', 'whereHint', 'look', 'question', 'hint', 'fact'] as const) {
+    for (const field of ['riddle', 'whereHint', 'look', 'question', 'hint'] as const) {
       expect(s[field].trim().length, field).toBeGreaterThan(3)
     }
   })
@@ -28,6 +28,37 @@ describe.each(routes)('route $id', (route) => {
     expect(s.place.lng).toBeLessThan(-3.66)
     expect(s.place.radiusM).toBeGreaterThanOrEqual(30)
     expect(s.place.radiusM).toBeLessThanOrEqual(150)
+  })
+
+  it.each(route.stops.map((s) => [s.id, s] as const))('%s: has a complete lesson', (_, s) => {
+    const l = s.lesson
+    expect(l.title.length).toBeGreaterThan(3)
+    expect(l.recap.length).toBeGreaterThan(5)
+    expect(l.story.length).toBeGreaterThanOrEqual(2)
+    expect(l.lookCloser.length).toBeGreaterThanOrEqual(2)
+    expect(l.words.length).toBeGreaterThanOrEqual(3)
+    expect(l.think.endsWith('?')).toBe(true)
+    expect(l.sources.length).toBeGreaterThanOrEqual(1)
+    for (const src of l.sources) expect(src.url).toMatch(/^https:\/\//)
+  })
+
+  it.each(route.stops.map((s) => [s.id, s] as const))('%s: quick check has one right answer among 3', (_, s) => {
+    const c = s.lesson.check
+    expect(new Set(c.options).size).toBe(3)
+    expect(c.options.filter((o) => o === c.answer)).toHaveLength(1)
+  })
+
+  it.each(route.stops.map((s) => [s.id, s] as const))('%s: lesson never gives away the quiz answer before you answer', (_, s) => {
+    // The lesson only shows after answering, but the riddle and hints must not contain the answer.
+    expect(s.riddle.toLowerCase()).not.toContain(s.answer.toLowerCase())
+    expect(s.whereHint.toLowerCase()).not.toContain(s.answer.toLowerCase())
+  })
+
+  it('timelines are in order', () => {
+    for (const s of route.stops) {
+      const years = s.lesson.timeline.map((t) => parseInt(t.year.replace(/\D/g, ''), 10)).filter((n) => !Number.isNaN(n) && n > 1000)
+      expect(years, s.id).toEqual([...years].sort((a, b) => a - b))
+    }
   })
 
   it('has no leg longer than 1.5 km', () => {

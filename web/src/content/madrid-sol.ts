@@ -1,4 +1,5 @@
 import type { Route } from '../types'
+import { lessons } from './madrid-sol-lessons'
 
 /**
  * Madrid · The Sol Route.
@@ -22,7 +23,7 @@ export const solRoute: Route = {
       options: ['0 km', '1 km', '10 km', '100 km'],
       answer: '0 km',
       hint: 'It’s where every distance starts.',
-      fact: 'Kilómetro Cero: Spain’s main roads are measured from this spot.',
+      lesson: lessons['km0'],
       verification: { status: 'draft' },
     },
     {
@@ -35,7 +36,7 @@ export const solRoute: Route = {
       options: ['Olive', 'Strawberry tree', 'Orange', 'Fig'],
       answer: 'Strawberry tree',
       hint: 'Its Spanish name is part of the statue’s name.',
-      fact: 'The bear and the madroño (strawberry tree) are on Madrid’s coat of arms. Locals still meet “at the bear”.',
+      lesson: lessons['bear'],
       verification: { status: 'draft' },
     },
     {
@@ -48,7 +49,7 @@ export const solRoute: Route = {
       options: ['Felipe II', 'Felipe III', 'Carlos III', 'Fernando VII'],
       answer: 'Felipe III',
       hint: 'He was the son of the king who made Madrid the capital.',
-      fact: 'Felipe III. The Plaza Mayor was built during his reign.',
+      lesson: lessons['plaza-mayor'],
       verification: { status: 'draft' },
     },
     {
@@ -61,7 +62,7 @@ export const solRoute: Route = {
       options: ['Cutlers', 'Bakers', 'Shoemakers', 'Silversmiths'],
       answer: 'Cutlers',
       hint: 'Cuchillo means knife.',
-      fact: 'Cuchilleros were cutlers, the knife makers of old Madrid.',
+      lesson: lessons['cuchilleros'],
       verification: { status: 'draft' },
     },
     {
@@ -74,7 +75,7 @@ export const solRoute: Route = {
       options: ['Carved stone', 'An iron frame', 'Wooden beams', 'Red brick'],
       answer: 'An iron frame',
       hint: 'The riddle gave it away.',
-      fact: 'The iron-and-glass market opened in the early 20th century.',
+      lesson: lessons['san-miguel'],
       verification: { status: 'draft' },
     },
     {
@@ -87,7 +88,7 @@ export const solRoute: Route = {
       options: ['Blas de Lezo', 'Álvaro de Bazán', 'Cosme Churruca', 'Federico Gravina'],
       answer: 'Álvaro de Bazán',
       hint: 'He lived in the 16th century.',
-      fact: 'Álvaro de Bazán, a 16th-century admiral, faces the old town hall.',
+      lesson: lessons['plaza-villa'],
       verification: { status: 'draft' },
     },
     {
@@ -100,7 +101,7 @@ export const solRoute: Route = {
       options: ['San Francisco el Grande', 'Almudena Cathedral', 'San Jerónimo el Real', 'San Ginés'],
       answer: 'Almudena Cathedral',
       hint: 'It is Madrid’s cathedral.',
-      fact: 'The Royal Palace and the Almudena Cathedral face each other across this square.',
+      lesson: lessons['palacio'],
       verification: { status: 'draft' },
     },
     {
@@ -113,7 +114,7 @@ export const solRoute: Route = {
       options: ['Greece', 'Italy', 'Egypt', 'Turkey'],
       answer: 'Egypt',
       hint: 'Think of pyramids.',
-      fact: 'Egypt gave the temple to Spain for helping to save the Nubian temples. Stay for the sunset!',
+      lesson: lessons['debod'],
       verification: { status: 'draft' },
     },
   ],

@@ -21,9 +21,32 @@ export interface Stop {
   answer: string
   /** Quiz hint (costs points). */
   hint: string
-  /** Shown after a correct answer. */
-  fact: string
+  /** The 2-minute lesson shown after a correct answer. */
+  lesson: Lesson
   verification: { status: 'draft' | 'verified'; date?: string }
+}
+
+export interface Lesson {
+  /** Display name, e.g. "Plaza Mayor". */
+  title: string
+  subtitle: string
+  /** One line for the route recap. */
+  recap: string
+  numbers: [Fact, Fact, Fact]
+  /** Short paragraphs, each with a bold lead-in. */
+  story: { lead: string; text: string }[]
+  timeline: { year: string; text: string }[]
+  context: { title: string; text: string }
+  lookCloser: { title: string; text: string }[]
+  words: { es: string; en: string }[]
+  think: string
+  check: { question: string; options: [string, string, string]; answer: string }
+  sources: { name: string; url: string }[]
+}
+
+export interface Fact {
+  value: string
+  label: string
 }
 
 export interface Route {

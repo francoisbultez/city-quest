@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { Correct } from './components/Correct'
 import { End } from './components/End'
 import { Home } from './components/Home'
+import { Lesson } from './components/Lesson'
 import { Modal } from './components/Modal'
 import { Quiz } from './components/Quiz'
 import { Walk } from './components/Walk'
 import { routes } from './content/madrid-sol'
-import { currentStreak, isPerfect, starsFor, stopPoints, totalPoints } from './lib/game'
-import { awardBadge, loadBadges, loadSession, newSession, saveSession, type Session } from './lib/session'
+import { currentStreak, isPerfect, starsFor, stopPoints } from './lib/game'
+import { awardBadge, loadBadges, loadSession, newSession, saveSession, sessionPoints, type Session } from './lib/session'
 import { reportClue } from './lib/storage'
 
 const REASONS = ['Can’t find it', 'Answer looks wrong', 'Covered or closed', 'Other']
@@ -20,6 +20,8 @@ export default function App() {
   const [pause, setPause] = useState<'menu' | 'report' | null>(null)
   const [reason, setReason] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
+  const [review, setReview] = useState<number | null>(null)
+  const answers = Object.fromEntries(route.stops.map((st) => [st.id, st.lesson.check.answer]))
 
   const update = (s: Session | null) => {
     setSession(s)
@@ -48,7 +50,15 @@ export default function App() {
   const s = session
   const stop = route.stops[s.index]
   const total = route.stops.length
-  const points = totalPoints(s.results)
+  const points = sessionPoints(s, answers)
+  const spottedFor = (id: string) => s.spotted.filter((k) => k.startsWith(id + ':')).map((k) => Number(k.split(':')[1]))
+  const toggleSpot = (id: string, i: number) => {
+    const key = `${id}:${i}`
+    update({ ...s, spotted: s.spotted.includes(key) ? s.spotted.filter((k) => k !== key) : [...s.spotted, key] })
+  }
+  const answerCheck = (id: string, o: string) => {
+    if (s.checks[id] === undefined) update({ ...s, checks: { ...s.checks, [id]: o } })
+  }
   const isLast = s.index === total - 1
 
   const leave = () => {
@@ -108,23 +118,25 @@ export default function App() {
         onWrong={() => update({ ...s, wrongs: s.wrongs + 1 })}
         onCorrect={() => {
           const result = { id: stop.id, points: stopPoints(s), perfect: isPerfect(s) }
-          update({ ...s, screen: 'correct', results: [...s.results, result] })
+          update({ ...s, screen: 'lesson', results: [...s.results, result] })
         }}
       />
     )
-  } else if (s.screen === 'correct') {
+  } else if (s.screen === 'lesson') {
     const last = s.results[s.results.length - 1]
     screen = (
-      <Correct
+      <Lesson
+        key={stop.id}
         stop={stop}
         index={s.index}
         total={total}
-        earned={last.points}
-        perfect={last.perfect}
-        streak={currentStreak(s.results)}
-        points={points}
-        isLast={isLast}
-        onNext={() => {
+        result={{ earned: last.points, perfect: last.perfect, streak: currentStreak(s.results), points }}
+        picked={s.checks[stop.id]}
+        spotted={spottedFor(stop.id)}
+        onCheck={(o) => answerCheck(stop.id, o)}
+        onSpot={(i) => toggleSpot(stop.id, i)}
+        actionLabel={isLast ? 'See my badge' : 'Next riddle'}
+        onAction={() => {
           if (!isLast) return update({ ...s, screen: 'walk', index: s.index + 1, wrongs: 0, hinted: false })
           const finishedAt = Date.now()
           setBadges(awardBadge({ routeId: route.id, mode: 'solo', stars: starsFor(points, total), points, date: new Date(finishedAt).toISOString() }))
@@ -132,11 +144,30 @@ export default function App() {
         }}
       />
     )
+  } else if (review !== null) {
+    const rs = route.stops[review]
+    screen = (
+      <Lesson
+        key={rs.id}
+        stop={rs}
+        index={review}
+        total={total}
+        picked={s.checks[rs.id]}
+        spotted={spottedFor(rs.id)}
+        onCheck={(o) => answerCheck(rs.id, o)}
+        onSpot={(i) => toggleSpot(rs.id, i)}
+        actionLabel="Back to my badge"
+        onAction={() => setReview(null)}
+        onBack={() => setReview(null)}
+      />
+    )
   } else {
     screen = (
       <End
         route={route}
         session={s}
+        points={points}
+        onReview={setReview}
         onHome={() => {
           update(null)
           setAtHome(true)

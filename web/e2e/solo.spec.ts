@@ -60,9 +60,30 @@ test('plays the whole Sol Route solo and unlocks the badge', async ({ page }) =>
 
     await page.getByRole('button', { name: s.answer, exact: true }).click()
     const expected = i === 1 ? 80 : i === 2 ? 60 : 100
-    await expect(page.getByText(`+${expected}`)).toBeVisible()
-    await expect(page.getByText(i === 1 || i === 2 ? `${s.answer}. Correct!` : `${s.answer}. Perfect!`)).toBeVisible()
-    await expect(page.getByText(s.fact)).toBeVisible()
+    await expect(page.getByText(`${s.answer}. ${i === 1 || i === 2 ? 'Correct!' : 'Perfect!'} +${expected}`)).toBeVisible()
+    // The lesson opens straight away.
+    await expect(page.getByRole('heading', { level: 1, name: s.lesson.title })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'The story' })).toBeVisible()
+    await expect(page.getByText(s.lesson.think)).toBeVisible()
+
+    if (i === 0) {
+      // Quick check: right answer earns +10, and can't be answered twice.
+      await page.getByRole('button', { name: s.lesson.check.answer, exact: true }).click()
+      await expect(page.getByText('Right! You were paying attention.')).toBeVisible()
+      await expect(page.getByText('+10 earned')).toBeVisible()
+      await expect(page.getByRole('button', { name: s.lesson.check.answer, exact: true })).toBeDisabled()
+      // Tick a "look closer" item.
+      const spot = page.getByRole('button', { name: new RegExp(s.lesson.lookCloser[0].title.replace('.', '\\.')) })
+      await spot.click()
+      await expect(spot).toHaveAttribute('aria-pressed', 'true')
+    }
+    if (i === 1) {
+      // Wrong quick check: no bonus, the right answer is shown.
+      const wrong = s.lesson.check.options.find((o) => o !== s.lesson.check.answer)!
+      await page.getByRole('button', { name: wrong, exact: true }).click()
+      await expect(page.getByText(`The answer is ${s.lesson.check.answer}.`)).toBeVisible()
+      await expect(page.getByText('No bonus')).toBeVisible()
+    }
 
     const last = i === stops.length - 1
     await page.getByRole('button', { name: last ? 'See my badge' : 'Next riddle' }).click()
@@ -70,15 +91,24 @@ test('plays the whole Sol Route solo and unlocks the badge', async ({ page }) =>
 
   await expect(page.getByText('New badge unlocked')).toBeVisible()
   await expect(page.getByRole('img', { name: 'Solo badge: MADRID, THE SOL ROUTE' })).toBeVisible()
-  // 6 perfect stops (100) + one wrong try (80) + one hint (60) = 740 → 3 stars
-  await expect(page.getByTestId('final-score')).toHaveText('740')
+  // 6 perfect stops (100) + one wrong try (80) + one hint (60) + one quick check (10) = 750 → 3 stars
+  await expect(page.getByTestId('final-score')).toHaveText('750')
   await expect(page.getByRole('img', { name: '3 of 3 stars' })).toBeVisible()
   await expect(page.getByText('6/8')).toBeVisible()
+  await expect(page.getByText('1 of 8 quick checks right · 1 details spotted')).toBeVisible()
+
+  // The recap reopens any lesson.
+  await expect(page.getByRole('heading', { name: '8 places you discovered' })).toBeVisible()
+  await page.getByRole('button', { name: new RegExp(stops[2].lesson.title) }).click()
+  await expect(page.getByRole('heading', { level: 1, name: stops[2].lesson.title })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Timeline' })).toBeVisible()
+  await page.getByRole('button', { name: 'Back to my badge' }).first().click()
+  await expect(page.getByText('New badge unlocked')).toBeVisible()
 
   await page.getByRole('button', { name: 'Back to start' }).click()
   await expect(page.getByText('1 badge')).toBeVisible()
   await expect(page.getByText('Your badge')).toBeVisible()
-  await expect(page.getByText('Best score: 740 points')).toBeVisible()
+  await expect(page.getByText('Best score: 750 points')).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -90,7 +120,7 @@ test('shows a streak after two perfect answers in a row', async ({ page }) => {
   await page.getByRole('button', { name: 'Next riddle' }).click()
   await arriveAndOpenQuiz(page, stops[1])
   await page.getByRole('button', { name: stops[1].answer, exact: true }).click()
-  await expect(page.getByText('2 in a row')).toBeVisible()
+  await expect(page.getByText(/2 in a row/)).toBeVisible()
 })
 
 test('walking: distance and warmth, location hint, and "I’m here" fallback', async ({ page, context }) => {

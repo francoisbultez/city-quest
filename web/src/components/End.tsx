@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { confetti } from '../lib/fx'
-import { bestStreak, formatDuration, maxPoints, starsFor, totalPoints } from '../lib/game'
+import { bestStreak, CHECK_BONUS, formatDuration, maxPoints, starsFor } from '../lib/game'
 import { routeKm } from '../lib/route'
 import type { Session } from '../lib/session'
 import type { Route } from '../types'
@@ -8,9 +8,8 @@ import { Badge, Stars } from './Badge'
 
 const STEPS_PER_KM = 1400
 
-export function End({ route, session, onHome }: { route: Route; session: Session; onHome: () => void }) {
+export function End({ route, session, points, onHome, onReview }: { route: Route; session: Session; points: number; onHome: () => void; onReview: (index: number) => void }) {
   const total = route.stops.length
-  const points = totalPoints(session.results)
   const stars = starsFor(points, total)
   const firstTry = session.results.filter((r) => r.perfect).length
   const km = routeKm(route.stops)
@@ -48,11 +47,31 @@ export function End({ route, session, onHome }: { route: Route; session: Session
       <p className="sub">Solo · {stars} of 3 stars · completed today</p>
 
       <div className="stats">
-        <div><span>Points</span><b className="accent" data-testid="final-score">{points}</b><small>of {maxPoints(total)}</small></div>
+        <div><span>Points</span><b className="accent" data-testid="final-score">{points}</b><small>of {maxPoints(total) + total * CHECK_BONUS} with bonuses</small></div>
         <div><span>First try</span><b>{firstTry}/{total}</b><small>best streak: {bestStreak(session.results)}</small></div>
         <div><span>Walked</span><b>{km.toFixed(1)}<i>{"\u00a0"}km</i></b><small>about {(Math.round((km * STEPS_PER_KM) / 100) * 100).toLocaleString('en')} steps</small></div>
         <div><span>Time</span><b>{formatDuration(elapsed)}</b><small>{total} places found</small></div>
       </div>
+
+      <p className="learned">
+        {Object.entries(session.checks).filter(([id, o]) => route.stops.find((x) => x.id === id)?.lesson.check.answer === o).length} of {total} quick checks right · {session.spotted.length} details spotted
+      </p>
+
+      <section className="recap">
+        <h2>{total} places you discovered</h2>
+        <p>Tap one to read its story again</p>
+        <ul>
+          {route.stops.map((st, i) => (
+            <li key={st.id}>
+              <button onClick={() => onReview(i)}>
+                <span className="n">{i + 1}</span>
+                <span className="txt"><b>{st.lesson.title}</b><small>{st.lesson.recap}</small></span>
+                <span className="chev" aria-hidden="true">›</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <div className="end-actions">
         <button className="btn primary" onClick={share}>Share my badge</button>
