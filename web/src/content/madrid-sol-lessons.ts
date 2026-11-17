@@ -12,6 +12,7 @@ const WIKI = (path: string, name = 'Wikipedia') => ({ name, url: `https://en.wik
 export const lessons: Record<string, Lesson> = {
   km0: {
     title: 'Kilómetro Cero',
+    image: {"src": "images/km0.jpg", "alt": "The Puerta del Sol, with the old Royal Post Office and its clock tower", "credit": {"artist": "Matt Joseph", "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0", "page": "https://commons.wikimedia.org/wiki/File:2026-09-03_-_Puerta_del_Sol_in_Madrid_Spain.jpg"}},
     subtitle: 'The point every main road in Spain is measured from',
     recap: 'Where Spain’s main roads are measured from',
     numbers: [
@@ -50,6 +51,7 @@ export const lessons: Record<string, Lesson> = {
 
   bear: {
     title: 'El Oso y el Madroño',
+    image: {"src": "images/bear.jpg", "alt": "The bronze bear reaching into the strawberry tree, with the clock tower behind it", "credit": {"artist": "Rafesmar", "license": "CC BY-SA 3.0 es", "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/es/deed.en", "page": "https://commons.wikimedia.org/wiki/File:Oso_Madro%C3%B1o_y_Sol.jpg"}, "position": "50% 55%"},
     subtitle: 'Madrid’s coat of arms, cast in bronze',
     recap: 'Madrid’s symbol, on this square since 1967',
     numbers: [
@@ -90,6 +92,7 @@ export const lessons: Record<string, Lesson> = {
 
   'plaza-mayor': {
     title: 'Plaza Mayor',
+    image: {"src": "images/plaza-mayor.jpg", "alt": "The Plaza Mayor, with the statue of Felipe III in front of the painted Casa de la Panadería", "credit": {"artist": "Jorge Franganillo", "license": "CC BY 2.0", "licenseUrl": "https://creativecommons.org/licenses/by/2.0", "page": "https://commons.wikimedia.org/wiki/File:Madrid_Plaza_Mayor_(48733706273).jpg"}},
     subtitle: 'The great square of Habsburg Madrid, and the city’s stage for 400 years',
     recap: 'Finished in 1619 · 10 entrances',
     numbers: [
@@ -135,6 +138,7 @@ export const lessons: Record<string, Lesson> = {
 
   cuchilleros: {
     title: 'Arco de Cuchilleros',
+    image: {"src": "images/cuchilleros.jpg", "alt": "The Arco de Cuchilleros: a stone arch with steps, seen from the street below", "credit": {"artist": "Tamorlan", "license": "CC BY-SA 3.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0", "page": "https://commons.wikimedia.org/wiki/File:Arco_de_cuchilleros_-_2013.jpg"}, "position": "50% 62%"},
     subtitle: 'The steep way down to old Madrid’s taverns',
     recap: 'Steps down to Botín, open since 1725',
     numbers: [
@@ -176,6 +180,7 @@ export const lessons: Record<string, Lesson> = {
 
   'san-miguel': {
     title: 'Mercado de San Miguel',
+    image: {"src": "images/san-miguel.jpg", "alt": "The Mercado de San Miguel, an iron and glass market hall", "credit": {"artist": "Fernando", "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0", "page": "https://commons.wikimedia.org/wiki/File:Mercado_de_San_Miguel_2025.jpg"}},
     subtitle: 'An iron market hall from 1916, reborn as a food hall',
     recap: 'Iron market hall, opened in 1916',
     numbers: [
@@ -218,6 +223,7 @@ export const lessons: Record<string, Lesson> = {
 
   'plaza-villa': {
     title: 'Plaza de la Villa',
+    image: {"src": "images/plaza-villa.jpg", "alt": "The Plaza de la Villa, with the old town hall and the admiral’s statue", "credit": {"artist": "karel291", "license": "CC BY 3.0", "licenseUrl": "https://creativecommons.org/licenses/by/3.0", "page": "https://commons.wikimedia.org/wiki/File:%D0%9F%D0%BB%D0%BE%D1%89%D0%B0%D0%B4%D1%8C_%D0%92%D0%B8%D0%BB%D1%8C%D1%8F_-_panoramio.jpg"}},
     subtitle: 'Where Madrid was governed for centuries',
     recap: 'Madrid’s town hall square until 2007',
     numbers: [
@@ -262,6 +268,7 @@ export const lessons: Record<string, Lesson> = {
 
   palacio: {
     title: 'Royal Palace',
+    image: {"src": "images/palacio.jpg", "alt": "Aerial view of the Royal Palace, with the Almudena Cathedral just behind it", "credit": {"artist": "Tim Adams", "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0", "page": "https://commons.wikimedia.org/wiki/File:Palacio_Real_de_Madrid_Julio_2016_(cropped).jpg"}},
     subtitle: 'A palace built on the ashes of a fortress',
     recap: 'Begun in 1738 after the Alcázar burned',
     numbers: [
@@ -301,6 +308,7 @@ export const lessons: Record<string, Lesson> = {
 
   debod: {
     title: 'Templo de Debod',
+    image: {"src": "images/debod.jpg", "alt": "The Templo de Debod and its two stone gateways, in a Madrid park", "credit": {"artist": "Matt Joseph", "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0", "page": "https://commons.wikimedia.org/wiki/File:2026-09-03_-_Temple_of_Debod_in_Madrid_Spain_01.jpg"}},
     subtitle: 'A 2,200-year-old Egyptian temple in a Madrid park',
     recap: '2,000+ years old, rebuilt here in 1972',
     numbers: [

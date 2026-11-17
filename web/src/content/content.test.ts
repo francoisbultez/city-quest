@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { distanceM, MAX_GPS_SLACK_M } from '../lib/route'
 import { routes } from './madrid-sol'
@@ -52,6 +53,16 @@ describe.each(routes)('route $id', (route) => {
     // The lesson only shows after answering, but the riddle and hints must not contain the answer.
     expect(s.riddle.toLowerCase()).not.toContain(s.answer.toLowerCase())
     expect(s.whereHint.toLowerCase()).not.toContain(s.answer.toLowerCase())
+  })
+
+  it.each(route.stops.map((s) => [s.id, s] as const))('%s: has a credited, free-licence photo that exists', (_, s) => {
+    const img = s.lesson.image!
+    expect(img, 'photo').toBeDefined()
+    expect(existsSync(`public/${img.src}`), img.src).toBe(true)
+    expect(img.alt.length).toBeGreaterThan(10)
+    expect(img.credit.artist.length).toBeGreaterThan(1)
+    expect(img.credit.license).toMatch(/^(CC BY|CC BY-SA|CC0|Public domain)/)
+    expect(img.credit.page).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/)
   })
 
   it('timelines are in order', () => {

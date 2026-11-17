@@ -63,6 +63,8 @@ test('plays the whole Sol Route solo and unlocks the badge', async ({ page }) =>
     await expect(page.getByText(`${s.answer}. ${i === 1 || i === 2 ? 'Correct!' : 'Perfect!'} +${expected}`)).toBeVisible()
     // The lesson opens straight away.
     await expect(page.getByRole('heading', { level: 1, name: s.lesson.title })).toBeVisible()
+    await expect(page.getByRole('img', { name: s.lesson.image!.alt })).toBeVisible()
+    await expect(page.getByText(`Photo: ${s.lesson.image!.credit.artist}`)).toBeVisible()
     await expect(page.getByRole('heading', { name: 'The story' })).toBeVisible()
     await expect(page.getByText(s.lesson.think)).toBeVisible()
 
