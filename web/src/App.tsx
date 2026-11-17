@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { End } from './components/End'
 import { Home } from './components/Home'
 import { Lesson } from './components/Lesson'
@@ -7,18 +7,21 @@ import { Quiz } from './components/Quiz'
 import { Walk } from './components/Walk'
 import { Team } from './components/team/Team'
 import { TeamJoin } from './components/team/TeamJoin'
-import { routes } from './content/madrid-sol'
+import { routeById, routes } from './content/routes'
 import { currentStreak, isPerfect, starsFor, stopPoints } from './lib/game'
 import { awardBadge, loadBadges, loadSession, newSession, saveSession, sessionPoints, type Session } from './lib/session'
-import { reportClue } from './lib/storage'
+import { load, reportClue, save } from './lib/storage'
 import { loadName, loadTeam, openRoom, saveTeam } from './lib/team/room'
 import type { Room } from './lib/team/types'
 
 const REASONS = ['Can’t find it', 'Answer looks wrong', 'Covered or closed', 'Other']
 
 export default function App() {
-  const route = routes[0]
   const [session, setSession] = useState<Session | null>(loadSession)
+  // Route shown on the home screen; a solo game always plays its own route.
+  const [pickedId, setPickedId] = useState(() => load<string | null>('cq.route', null) ?? session?.routeId ?? routes[0].id)
+  const picked = routeById(pickedId)
+  const route = session ? routeById(session.routeId) : picked
   const [badges, setBadges] = useState(loadBadges)
   const [atHome, setAtHome] = useState(true)
   const [pause, setPause] = useState<'menu' | 'report' | null>(null)
@@ -31,7 +34,6 @@ export default function App() {
   const [teamCode, setTeamCode] = useState(() => loadTeam()?.code ?? null)
   const [room, setRoom] = useState<Room | null>(null)
   const [homeMode, setHomeMode] = useState<'solo' | 'team'>(inviteCode || loadTeam() ? 'team' : 'solo')
-  const onBadges = useCallback((b: typeof badges) => setBadges(b), [])
 
   // Reconnect to the team after a reload.
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function App() {
   if (teamView === 'join') {
     return (
       <TeamJoin
-        route={route}
+        route={picked}
         initialCode={inviteCode}
         onBack={() => setTeamView(null)}
         onJoined={(r) => {
@@ -78,9 +80,8 @@ export default function App() {
     return (
       <Team
         key={room.code}
-        route={route}
         room={room}
-        onBadges={onBadges}
+        onBadges={setBadges}
         onExit={(left) => {
           if (left) {
             saveTeam(null)
@@ -102,11 +103,16 @@ export default function App() {
         initialMode={homeMode}
         team={teamCode}
         onTogether={() => setTeamView(teamCode ? 'play' : 'join')}
-        route={route}
+        route={picked}
+        routes={routes}
+        onPickRoute={(id) => {
+          setPickedId(id)
+          save('cq.route', id)
+        }}
         badges={badges}
         session={session}
         onStart={() => {
-          update(newSession(route.id))
+          update(newSession(picked.id))
           setAtHome(false)
         }}
         onResume={() => setAtHome(false)}
@@ -251,3 +257,4 @@ export default function App() {
     </>
   )
 }
+

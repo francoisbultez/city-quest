@@ -12,6 +12,8 @@ export const solRoute: Route = {
   name: 'The Sol Route',
   badgeLine: 'THE SOL ROUTE',
   tagline: '8 riddles from the Puerta del Sol to the Templo de Debod',
+  start: 'the Puerta del Sol',
+  duration: '~2 h',
   stops: [
     {
       id: 'km0',
@@ -120,4 +122,3 @@ export const solRoute: Route = {
   ],
 }
 
-export const routes = [solRoute]

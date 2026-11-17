@@ -59,6 +59,10 @@ export interface Route {
   /** e.g. "SOL → DEBOD", printed on the badge */
   badgeLine: string
   tagline: string
+  /** Where the route starts, for "Start at …", e.g. "the Puerta del Sol". */
+  start: string
+  /** Rough time to play, e.g. "~2 h". */
+  duration: string
   stops: Stop[]
 }
 

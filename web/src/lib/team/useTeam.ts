@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { distanceM } from '../route'
 import type { Position } from '../useGeolocation'
-import type { Stop } from '../../types'
+import { routeById } from '../../content/routes'
 import { advancePatch, allReady, leaderId, presentIds, resolveAgreement, voteState } from './logic'
 import type { Patch, Room, TeamGame } from './types'
 
 const HEARTBEAT_MS = 15_000
 
 /** Live team game plus the actions a player can take. */
-export function useTeam(room: Room, stops: Stop[]) {
+export function useTeam(room: Room) {
   const me = room.me
   const [game, setGame] = useState<TeamGame | null | undefined>(undefined)
   const [now, setNow] = useState(() => room.now())
@@ -42,6 +42,7 @@ export function useTeam(room: Room, stops: Stop[]) {
     }
   }, [room, me])
 
+  const stops = game ? routeById(game.routeId).stops : []
   const present = game ? presentIds(game, now, me) : []
   const isLeader = !!game && leaderId(game, now, me) === me
 

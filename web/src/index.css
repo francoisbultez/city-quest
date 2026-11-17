@@ -339,3 +339,9 @@ h1, h2 { margin: 0; letter-spacing: -0.045em; text-wrap: balance; }
 .award small { font-size: 14px; color: rgba(255, 255, 255, 0.8); }
 .modal-note { margin: -6px 0 0; color: var(--muted); font-size: 14.5px; }
 .join-head .pill.icon svg { fill: none; }
+
+/* Route picker on the home screen */
+.route-picker { margin-top: 18px; display: flex; gap: 6px; padding: 4px; border-radius: 999px; background: var(--soft); }
+.route-picker button { flex: 1; min-height: 40px; border: 0; border-radius: 999px; background: transparent; font-weight: 650; font-size: 14.5px; color: var(--muted); }
+.route-picker button.on { background: #fff; color: var(--ink); box-shadow: var(--shadow-sm); }
+.route-picker + .route-card { margin-top: 12px; }

@@ -1,0 +1,306 @@
+import type { Lesson } from '../types'
+
+/**
+ * Lessons for Madrid · The Usera Route.
+ * Built from the sources listed on each lesson. Where sources disagreed
+ * (the library's number of floors, the size of the lake, who paid for the panda)
+ * the detail was left out or kept general.
+ * DRAFT: check every fact on the ground before launch.
+ */
+
+const ESWIKI = (path: string, name = 'Wikipedia (Spanish)') => ({ name, url: `https://es.wikipedia.org/wiki/${path}` })
+const LEAFLET = { name: 'Madrid City Council: “Pasea Madrid · Distrito de Usera” walk', url: 'https://patrimonioypaisaje.madrid.es/FWProjects/monumenta/contenidos/ficheros/folleto_Usera.pdf' }
+
+export const lessons: Record<string, Lesson> = {
+  'usera-metro': {
+    title: 'A neighbourhood named after a family',
+    image: {"src": "images/usera-metro.jpg", "alt": "The entrance to Usera metro station, with the red Metro sign", "credit": {"artist": "Zarateman", "license": "CC0", "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/", "page": "https://commons.wikimedia.org/wiki/File:Madrid_-_Estación_de_Usera.jpg"}, "position": "50% 40%"},
+    subtitle: 'How a farmer’s fields became a barrio, and why its streets have first names',
+    recap: 'Usera is named after a colonel, and its streets after his family',
+    numbers: [
+      { value: '1925', label: 'the fields start being sold as plots' },
+      { value: '7', label: 'barrios in the district today' },
+      { value: '1954', label: 'joins the city of Madrid' },
+    ],
+    story: [
+      { lead: 'A wedding, then a plan.', text: 'This land belonged to a farmer from Villaverde known as “Tío Sordillo”. His daughter, Carmen del Río, married Colonel Marcelo Usera, a soldier and businessman who decided houses would pay better than crops.' },
+      { lead: 'Plots for sale.', text: 'Between 1925 and 1930 the fields were divided into plots and sold. Working families from all over Spain built their homes here.' },
+      { lead: 'Streets with first names.', text: 'The colonel’s administrator drew the street plan and named the streets after the Usera family, their staff and some neighbours. That’s why you walk along Amparo Usera, Gabriel Usera and Isabelita Usera.' },
+    ],
+    timeline: [
+      { year: '1925', text: 'The Usera fields start being sold as building plots' },
+      { year: '1954', text: 'Villaverde, which owned most of this land, becomes part of Madrid' },
+      { year: '1960s', text: 'Families arrive from rural Spain and the barrio grows fast' },
+      { year: '1987', text: 'Usera becomes its own district of Madrid' },
+      { year: '2000s', text: 'Usera becomes Madrid’s Chinatown' },
+    ],
+    context: {
+      title: 'Madrid grew by swallowing villages',
+      text: 'Many districts you know today were separate towns until the 1940s and 1950s: Carabanchel, Vallecas, Villaverde. As Madrid grew, it absorbed them, and their fields became neighbourhoods like this one.',
+    },
+    lookCloser: [
+      { title: 'Street signs.', text: 'Madrid’s blue-and-white tiled street signs often have a small picture. Look for the ones around the station.' },
+      { title: 'Shop signs.', text: 'Count the shop signs in Chinese characters you can see from here. There will be more soon.' },
+    ],
+    words: [
+      { es: 'barrio', en: 'neighbourhood' },
+      { es: 'calle', en: 'street' },
+      { es: 'vecinos', en: 'neighbours, residents' },
+      { es: 'campo', en: 'field, countryside' },
+    ],
+    think: 'If you could name the street where you live after someone in your family, who would it be?',
+    check: { question: 'What was this land before the 1920s?', options: ['Farm fields', 'A royal hunting forest', 'A lake'], answer: 'Farm fields' },
+    sources: [ESWIKI('Usera'), LEAFLET],
+  },
+
+  sundials: {
+    title: 'The 17 sundials of Moscardó',
+    subtitle: 'An open-air clock museum painted on the walls of a 1920s housing estate',
+    recap: '17 sundials designed by an artist and a mathematician',
+    numbers: [
+      { value: '17', label: 'sundials in a few streets' },
+      { value: '1980s', label: 'when they were designed' },
+      { value: '2022', label: 'restored' },
+    ],
+    story: [
+      { lead: 'An artist and a mathematician.', text: 'In the 1980s the designer Alberto Corazón and the mathematician Juan José Caurcel teamed up to put sundials on these walls: one brought the art, the other the maths of shadows (called gnomonics).' },
+      { lead: 'A whole collection.', text: 'There are 17 of them on the façades and passages of Calle de Gumersindo de Azcárate, Doctor Sanchís Banús and Ramón de Madariaga. Each one is different.' },
+      { lead: 'An old estate.', text: 'These houses were planned around 1928 as the “Salud y Ahorro” (Health and Savings) estate, one of Madrid’s early housing projects for working families. After the Civil War it was renamed after General Moscardó, and the name stuck.' },
+    ],
+    timeline: [
+      { year: '1928', text: 'Building starts on the Salud y Ahorro estate' },
+      { year: '1940s', text: 'Renamed Colonia Moscardó' },
+      { year: '1980s', text: 'Alberto Corazón and Juan José Caurcel design the sundials' },
+      { year: '2022', text: 'The sundials are restored' },
+    ],
+    context: {
+      title: 'Why the sundial disagrees with your phone',
+      text: 'A sundial shows solar time: noon is when the sun is highest. Spain uses Central European Time, even though Madrid is west of Greenwich, so the sun is highest here around 1:15 pm in winter and 2:15 pm in summer. If a dial says 12 and your phone says 2, both are right.',
+    },
+    lookCloser: [
+      { title: 'The pointer.', text: 'Find a dial’s metal rod (the gnomon). It is tilted to point at the North Star, so it is parallel to the Earth’s axis.' },
+      { title: 'Hunt them all.', text: 'Walk the nearby passages and count how many dials you can find. Some are easy to miss.' },
+    ],
+    words: [
+      { es: 'reloj de sol', en: 'sundial' },
+      { es: 'sombra', en: 'shadow' },
+      { es: 'mediodía', en: 'midday' },
+      { es: 'hora', en: 'hour, time' },
+    ],
+    think: 'If clocks had never been invented, how would you agree with a friend on what time to meet?',
+    check: { question: 'When is the sun highest in Madrid in summer, by the clock?', options: ['Around 12:00', 'Around 2:15 pm', 'Around 5:00 pm'], answer: 'Around 2:15 pm' },
+    sources: [
+      LEAFLET,
+      { name: 'Time Out Madrid: the sundial route', url: 'https://www.timeout.es/madrid/es/noticias/el-museo-al-aire-libre-que-esconde-madrid-una-ruta-gratuita-por-la-mayor-coleccion-de-relojes-de-sol-urbanos-de-espana-060926' },
+      { name: 'Diario de Madrid: following the sun in Moscardó', url: 'https://diario.madrid.es/blog/2021/09/14/tras-los-pasos-del-sol-en-moscardo/' },
+    ],
+  },
+
+  library: {
+    title: 'Biblioteca José Hierro',
+    image: {"src": "images/usera-library.jpg", "alt": "The José Hierro library: a tall block clad in grey panels", "credit": {"artist": "Luis García (Zaqarbal)", "license": "CC BY-SA 3.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0", "page": "https://commons.wikimedia.org/wiki/File:Biblioteca_Pública_José_Hierro_(Madrid)_01.jpg"}, "position": "50% 35%"},
+    subtitle: 'A library that grows upwards, named after a poet',
+    recap: 'A tower of books named after a Cervantes Prize poet',
+    numbers: [
+      { value: '2003', label: 'opened' },
+      { value: '259', label: 'reading places' },
+      { value: '1998', label: 'José Hierro wins the Cervantes Prize' },
+    ],
+    story: [
+      { lead: 'Up, not out.', text: 'Instead of a wide, low building, the architects Iñaki Ábalos and Juan Herreros stacked the library into a slim tower in the middle of a residential neighbourhood. It opened on 9 October 2003.' },
+      { lead: 'Who was José Hierro?', text: 'A Madrid-born poet (1922–2002) who was jailed for years after the Civil War and later became one of Spain’s best-loved writers. In 1998 he won the Cervantes Prize, the top award for writers in Spanish.' },
+      { lead: 'A tower for everyone.', text: 'Each level has a different use, from children’s books to quiet reading rooms. It’s free, like every public library in Madrid.' },
+    ],
+    timeline: [
+      { year: '1922', text: 'José Hierro is born in Madrid' },
+      { year: '1998', text: 'He wins the Cervantes Prize' },
+      { year: '2002', text: 'José Hierro dies in Madrid' },
+      { year: '2003', text: 'The library opens in Usera' },
+    ],
+    context: {
+      title: 'Why build a library as a tower?',
+      text: 'Space is scarce in a dense neighbourhood. A tower leaves room for a square at its foot and becomes a landmark you can see from far away, a bit like a bell tower for books.',
+    },
+    lookCloser: [
+      { title: 'The walls.', text: 'Look at the outside skin of the building. Can you see what’s happening inside from the street?' },
+      { title: 'The name.', text: 'Find José Hierro’s name on the building.' },
+    ],
+    words: [
+      { es: 'biblioteca', en: 'library' },
+      { es: 'libro', en: 'book' },
+      { es: 'poeta', en: 'poet' },
+      { es: 'torre', en: 'tower' },
+    ],
+    think: 'Would you rather read in a cosy basement or at the top of a tower? Why?',
+    check: { question: 'Which prize did José Hierro win in 1998?', options: ['The Nobel Prize', 'The Cervantes Prize', 'An Oscar'], answer: 'The Cervantes Prize' },
+    sources: [
+      LEAFLET,
+      { name: 'Comunidad de Madrid: Biblioteca Pública José Hierro', url: 'https://www.comunidad.madrid/centros/biblioteca-jose-hierro' },
+      { name: 'Wikipedia: José Hierro', url: 'https://en.wikipedia.org/wiki/Jos%C3%A9_Hierro' },
+    ],
+  },
+
+  arch: {
+    title: 'Madrid’s first Chinese arch',
+    image: {"src": "images/usera-arch.jpg", "alt": "A red lion-dance costume at the Chinese New Year parade in Usera", "credit": {"artist": "Javier Pérez Montes", "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0", "page": "https://commons.wikimedia.org/wiki/File:Pasacalles_fiesta_año_nuevo_chino,_Usera,_Madrid_(dragón_rojo).jpg"}, "position": "50% 30%"},
+    subtitle: 'A gateway where two dragons meet the Madrid bear',
+    recap: 'A paifang by Okuda: two dragons for China, a bear for Madrid',
+    numbers: [
+      { value: '2026', label: 'unveiled, in October' },
+      { value: '2', label: 'dragons, for China' },
+      { value: '1', label: 'bear, for Madrid' },
+    ],
+    story: [
+      { lead: 'A gate with a meaning.', text: 'A paifang is a traditional Chinese gateway. Chinatowns from London to San Francisco have one at their entrance. This is the first in Madrid, unveiled in October 2026.' },
+      { lead: 'Two cultures on one arch.', text: 'The artist Okuda San Miguel, known for his multicoloured geometric style, surrounded it with two dragons, a symbol of China, and a bear, the symbol of Madrid. It was made together with the district and the local Chinese community.' },
+      { lead: 'The main street.', text: 'You’re on Calle de Dolores Barranco, the heart of Usera’s Chinatown, with its supermarkets, bakeries and restaurants. A second arch is planned on Calle de los Evangelios.' },
+    ],
+    timeline: [
+      { year: '2000s', text: 'Usera becomes Madrid’s Chinatown' },
+      { year: '2024', text: 'The city plans two Chinese arches for Usera' },
+      { year: '2026', text: 'Okuda’s arch is unveiled in the Plaza del Hidrógeno' },
+    ],
+    context: {
+      title: 'Where is everyone from?',
+      text: 'Usera has the largest Chinese community in Spain. Many families come from Zhejiang province in eastern China, especially the county of Qingtian, known for sending people all over Europe.',
+    },
+    lookCloser: [
+      { title: 'The colours.', text: 'Okuda uses rainbow triangles and geometric faces. Find his style on the dragons.' },
+      { title: 'The writing.', text: 'Look for Chinese characters on the arch and on the shop signs around you.' },
+    ],
+    words: [
+      { es: 'arco', en: 'arch' },
+      { es: 'dragón', en: 'dragon' },
+      { es: 'oso', en: 'bear' },
+      { es: 'comunidad', en: 'community' },
+    ],
+    think: 'If your town made a gate to welcome visitors, what two symbols would you put on it?',
+    check: { question: 'What does the dragon stand for on the arch?', options: ['Madrid', 'China', 'The river Manzanares'], answer: 'China' },
+    sources: [
+      { name: 'Diario de Madrid: Madrid’s first Chinese arch', url: 'https://diario.madrid.es/blog/notas-de-prensa/almeida-inaugura-el-primer-arco-chino-de-madrid-simbolo-del-entendimiento-entre-la-comunidad-china-y-la-ciudad/' },
+      { name: 'Time Out Madrid: Okuda’s arch', url: 'https://www.timeout.es/madrid/es/noticias/asi-sera-el-nuevo-y-espectacular-arco-del-chinatown-de-madrid-dos-dragones-un-oso-y-el-estilo-unico-de-okuda-092126' },
+      ESWIKI('Usera'),
+    ],
+  },
+
+  panda: {
+    title: 'The Usera panda',
+    subtitle: 'Half a tonne of marble at a neighbourhood crossroads',
+    recap: 'A marble panda, a gift and a symbol of friendship',
+    numbers: [
+      { value: '500 kg', label: 'of marble' },
+      { value: '1 m', label: 'tall' },
+      { value: '2022', label: 'arrived, in the autumn' },
+    ],
+    story: [
+      { lead: 'A national treasure.', text: 'In China the giant panda is called a national treasure, and pandas have long been sent abroad as gifts of friendship.' },
+      { lead: 'A gift to the barrio.', text: 'This marble panda on a granite base was presented in autumn 2022 as a gift from the district’s Chinese community, a symbol of living together.' },
+      { lead: 'Not everyone agreed.', text: 'Some neighbours pointed out that the messages on the pedestal were written in English and Chinese, but not in Spanish. Public art often starts conversations like that.' },
+    ],
+    timeline: [
+      { year: '1978', text: 'Madrid Zoo receives its first giant pandas, a gift from China' },
+      { year: '2022', text: 'The marble panda arrives in Usera' },
+      { year: '2026', text: 'The first Chinese arch opens a few streets away' },
+    ],
+    context: {
+      title: 'Chinese New Year in Usera',
+      text: 'Every year, around late January or February, Usera holds Madrid’s big Chinese New Year parade, with dragons, lions and drums. Hundreds of thousands of people come to watch.',
+    },
+    lookCloser: [
+      { title: 'The pedestal.', text: 'Read the messages on the base. Which languages can you spot?' },
+      { title: 'The paws.', text: 'Is the panda eating, sitting or playing?' },
+    ],
+    words: [
+      { es: 'mármol', en: 'marble' },
+      { es: 'regalo', en: 'gift' },
+      { es: 'amistad', en: 'friendship' },
+      { es: 'Año Nuevo Chino', en: 'Chinese New Year' },
+    ],
+    think: 'Should messages on public statues be written in every language spoken in the neighbourhood?',
+    check: { question: 'Why are pandas often given as gifts by China?', options: ['As a sign of friendship', 'Because they are cheap', 'To clean up bamboo'], answer: 'As a sign of friendship' },
+    sources: [
+      { name: 'Atlas Obscura: Usera’s Panda Bear', url: 'https://www.atlasobscura.com/places/useras-panda-bear-madrid-spain' },
+      { name: 'Diario de Madrid: Usera’s autumn festival', url: 'https://diario.madrid.es/blog/notas-de-prensa/usera-celebra-su-i-festival-de-otono/' },
+    ],
+  },
+
+  pradolongo: {
+    title: 'Parque de Pradolongo',
+    image: {"src": "images/usera-pradolongo.jpg", "alt": "Paths and geometric beds in the Pradolongo botanical garden", "credit": {"artist": "Bibliotecando", "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0", "page": "https://commons.wikimedia.org/wiki/File:Jardin_Botánico_Parque_de_Pradolongo.jpg"}},
+    subtitle: 'The park the neighbours designed',
+    recap: 'A huge park shaped by its neighbours, opened in 1983',
+    numbers: [
+      { value: '72 ha', label: 'of park, about 100 football pitches' },
+      { value: '1983', label: 'opened' },
+      { value: '180', label: 'species of trees and shrubs in the garden' },
+    ],
+    story: [
+      { lead: 'The neighbours’ park.', text: 'Pradolongo opened in 1983 under Madrid’s mayor Enrique Tierno Galván. It is often called the first “democratic” park because it was designed around what the people who would use it asked for.' },
+      { lead: 'A garden of the world.', text: 'The botanical garden next to the lake has 30 geometric flower beds arranged around seven small squares, with around 180 species of trees and shrubs: pines, cedars, oaks, olives and palms.' },
+      { lead: 'Madrid’s own shrub.', text: 'Among the native plants is the madroño, the strawberry tree from Madrid’s coat of arms, along with rosemary, thyme and lavender.' },
+    ],
+    timeline: [
+      { year: '1979', text: 'The botanical garden is laid out' },
+      { year: '1983', text: 'The park opens under mayor Tierno Galván' },
+      { year: '2023', text: 'The lake area is restored' },
+      { year: '2026', text: 'The Chinese New Year parade moves to the park' },
+    ],
+    context: {
+      title: 'What makes a park “democratic”?',
+      text: 'After 1975 Spain returned to democracy, and the first elected city councils took office in 1979. Neighbourhood associations, especially in the south of Madrid, fought for parks, schools and clinics, and often helped decide what they would be like.',
+    },
+    lookCloser: [
+      { title: 'The lake.', text: 'Look for goals hanging above the water: they’re for kayak polo, a mix of canoeing and water polo.' },
+      { title: 'Smell test.', text: 'Rub a leaf of rosemary or thyme between your fingers (without picking it).' },
+    ],
+    words: [
+      { es: 'parque', en: 'park' },
+      { es: 'lago', en: 'lake' },
+      { es: 'árbol', en: 'tree' },
+      { es: 'madroño', en: 'strawberry tree' },
+    ],
+    think: 'If you could design a park for your neighbourhood, what’s the first thing you would put in it?',
+    check: { question: 'Who helped decide how the park would look?', options: ['The king', 'The neighbours', 'A football club'], answer: 'The neighbours' },
+    sources: [ESWIKI('Parque_de_Pradolongo'), LEAFLET, { name: 'Time Out Madrid: Parque de Pradolongo', url: 'https://www.timeout.es/madrid/es/que-hacer/parque-de-pradolongo' }],
+  },
+
+  'maris-stella': {
+    title: 'Maris Stella, the “broken church”',
+    image: {"src": "images/usera-maris-stella.jpg", "alt": "The Maris Stella chapel and its dome behind a railing, with the sign of the environmental centre", "credit": {"artist": "Mentxuwiki", "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0", "page": "https://commons.wikimedia.org/wiki/File:Centro_de_Educación_Ambiental_y_Cultural_Maris_Stella_1.jpg"}},
+    subtitle: 'From a wartime ruin to a school, and now a centre for nature',
+    recap: 'The “broken church” with a rooster on its dome',
+    numbers: [
+      { value: '1900s', label: 'built, in the early 20th century' },
+      { value: '8', label: 'sides on its slate dome' },
+      { value: '1', label: 'rooster on top' },
+    ],
+    story: [
+      { lead: 'Star of the Sea.', text: 'Maris Stella is Latin for “Star of the Sea”, an old name for the Virgin Mary. Nobody knows exactly when this brick chapel was built, but it dates from the early 20th century.' },
+      { lead: 'The broken church.', text: 'It was badly damaged in the Spanish Civil War (1936–1939), so locals called it “la iglesia rota”. Others call it “the church of the rooster”, after the bird on its dome.' },
+      { lead: 'A school among shacks.', text: 'Families arriving from Castilla-La Mancha and Extremadura built homes nearby by hand, the start of the Orcasitas neighbourhood. For years this was the only building fit for a school, and children learned to read here.' },
+    ],
+    timeline: [
+      { year: '1900s', text: 'The chapel is built' },
+      { year: '1936', text: 'The Civil War begins; the church is badly damaged' },
+      { year: '1960s', text: 'It is used as a church and a school' },
+      { year: 'Today', text: 'It is the Maris Stella environmental and cultural centre' },
+    ],
+    context: {
+      title: 'Orcasitas: the neighbours who stayed',
+      text: 'In the 1970s the people of Orcasitas organised to replace their shacks with proper homes in the same place, instead of being moved away. Their neighbourhood association became one of the most famous in Spain.',
+    },
+    lookCloser: [
+      { title: 'The dome.', text: 'Count the sides of the dome. It’s an unusual shape for a church.' },
+      { title: 'The bricks.', text: 'Look for patches where the brickwork changes: the scars of repairs.' },
+    ],
+    words: [
+      { es: 'iglesia', en: 'church' },
+      { es: 'rota', en: 'broken' },
+      { es: 'gallo', en: 'rooster' },
+      { es: 'escuela', en: 'school' },
+    ],
+    think: 'Is it better to rebuild an old building as it was, or give it a new life with a new use?',
+    check: { question: 'What does “Maris Stella” mean?', options: ['Star of the Sea', 'Broken church', 'Little rooster'], answer: 'Star of the Sea' },
+    sources: [ESWIKI('Parque_de_Pradolongo'), LEAFLET],
+  },
+}

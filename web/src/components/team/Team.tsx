@@ -4,7 +4,7 @@ import { awardBadge, type EarnedBadge } from '../../lib/session'
 import { listNames, orderedResults, teamPoints } from '../../lib/team/logic'
 import type { Room } from '../../lib/team/types'
 import { useTeam } from '../../lib/team/useTeam'
-import type { Route } from '../../types'
+import { routeById } from '../../content/routes'
 import { Lesson } from '../Lesson'
 import { Modal } from '../Modal'
 import type { Mate } from '../RouteMap'
@@ -14,15 +14,15 @@ import { TeamLobby } from './TeamLobby'
 import { TeamQuiz } from './TeamQuiz'
 
 interface Props {
-  route: Route
   room: Room
   /** Leave the team screens; `left` is true when the player quit the team. */
   onExit: (left: boolean) => void
   onBadges: (b: EarnedBadge[]) => void
 }
 
-export function Team({ route, room, onExit, onBadges }: Props) {
-  const { game, me, present, isLeader, actions } = useTeam(room, route.stops)
+export function Team({ room, onExit, onBadges }: Props) {
+  const { game, me, present, isLeader, actions } = useTeam(room)
+  const route = routeById(game?.routeId)
   const [pause, setPause] = useState(false)
   const [review, setReview] = useState<number | null>(null)
   const awarded = useRef(false)

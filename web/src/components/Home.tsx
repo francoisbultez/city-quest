@@ -6,6 +6,8 @@ import { Badge, Stars } from './Badge'
 
 interface Props {
   route: Route
+  routes: Route[]
+  onPickRoute: (id: string) => void
   badges: EarnedBadge[]
   session: Session | null
   onStart: () => void
@@ -16,11 +18,10 @@ interface Props {
   initialMode?: 'solo' | 'team'
 }
 
-export function Home({ route, badges, session, onStart, onResume, team, onTogether, initialMode = 'solo' }: Props) {
+export function Home({ route, routes, onPickRoute, badges, session, onStart, onResume, team, onTogether, initialMode = 'solo' }: Props) {
   const [mode, setMode] = useState<'solo' | 'team'>(initialMode)
   const earned = badges.find((b) => b.routeId === route.id && b.mode === mode)
   const inProgress = session && session.routeId === route.id && session.screen !== 'end'
-  const startName = route.stops[0].place.name.split(',').pop()!.trim()
 
   return (
     <main className="home">
@@ -29,7 +30,17 @@ export function Home({ route, badges, session, onStart, onResume, team, onTogeth
         <span className="chip">{badges.length} {badges.length === 1 ? 'badge' : 'badges'}</span>
       </header>
 
-      <section className="route-card">
+      {routes.length > 1 && (
+        <div className="route-picker" role="group" aria-label="Choose a route">
+          {routes.map((r) => (
+            <button key={r.id} className={r.id === route.id ? 'on' : ''} aria-pressed={r.id === route.id} onClick={() => onPickRoute(r.id)}>
+              {r.name.replace(/^The /, '').replace(/ Route$/, '')}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <section className="route-card" key={route.id}>
         <span className="label">{earned ? 'Your badge' : 'Earn this badge'}</span>
         <Badge size={150} mode={mode} line={route.badgeLine} locked={false} />
         {earned && <Stars count={earned.stars} size={24} />}
@@ -37,7 +48,7 @@ export function Home({ route, badges, session, onStart, onResume, team, onTogeth
         <p>{earned ? `Best score: ${earned.points} points. Go for ${earned.stars < 3 ? 'more stars' : 'a perfect run'}?` : route.tagline}</p>
         <div className="chips">
           <span className="chip">{routeKm(route.stops).toFixed(1)} km</span>
-          <span className="chip">~2 h</span>
+          <span className="chip">{route.duration}</span>
           <span className="chip">up to 3 stars</span>
         </div>
       </section>
@@ -62,7 +73,7 @@ export function Home({ route, badges, session, onStart, onResume, team, onTogeth
             <button className="btn quiet" onClick={onStart}>Start again</button>
           </>
         ) : (
-          <button className="btn primary" onClick={onStart}>Start at the {startName}</button>
+          <button className="btn primary" onClick={onStart}>Start at {route.start}</button>
         )}
       </div>
     </main>
