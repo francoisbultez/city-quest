@@ -29,6 +29,8 @@ export interface Stop {
 export interface Lesson {
   /** Display name, e.g. "Plaza Mayor". */
   title: string
+  /** Main photo, stored in public/images. Free-licence photos only, with credit. */
+  image?: LessonImage
   subtitle: string
   /** One line for the route recap. */
   recap: string
@@ -58,4 +60,12 @@ export interface Route {
   badgeLine: string
   tagline: string
   stops: Stop[]
+}
+
+export interface LessonImage {
+  src: string
+  alt: string
+  /** CSS object-position for the 4:3 crop, e.g. "50% 55%". */
+  position?: string
+  credit: { artist: string; license: string; licenseUrl?: string | null; page: string }
 }

@@ -64,7 +64,14 @@ export function End({ route, session, points, onHome, onReview }: { route: Route
           {route.stops.map((st, i) => (
             <li key={st.id}>
               <button onClick={() => onReview(i)}>
-                <span className="n">{i + 1}</span>
+                {st.lesson.image ? (
+                  <span className="thumb">
+                    <img src={`${import.meta.env.BASE_URL}${st.lesson.image.src}`} alt="" loading="lazy" />
+                    <i>{i + 1}</i>
+                  </span>
+                ) : (
+                  <span className="n">{i + 1}</span>
+                )}
                 <span className="txt"><b>{st.lesson.title}</b><small>{st.lesson.recap}</small></span>
                 <span className="chev" aria-hidden="true">›</span>
               </button>

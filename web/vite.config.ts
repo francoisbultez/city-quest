@@ -19,7 +19,7 @@ export default defineConfig({
         icons: [{ src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,woff2,jpg}'],
         // The app shell and hunt content are precached, so play continues offline.
         // Map tiles are cached as they are viewed. Before launch, move to a paid or self-hosted
         // map style that allows offline packs.

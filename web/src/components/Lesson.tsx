@@ -61,6 +61,18 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
         <p>{l.subtitle}</p>
       </header>
 
+      {l.image && (
+        <figure className="lesson-photo">
+          <img src={`${import.meta.env.BASE_URL}${l.image.src}`} alt={l.image.alt} loading="eager" decoding="async" style={{ objectPosition: l.image.position ?? '50% 50%' }} />
+          <figcaption>
+            Photo: {l.image.credit.artist} ·{' '}
+            {l.image.credit.licenseUrl ? <a href={l.image.credit.licenseUrl} target="_blank" rel="noreferrer">{l.image.credit.license}</a> : l.image.credit.license}
+            {' · '}
+            <a href={l.image.credit.page} target="_blank" rel="noreferrer">Wikimedia Commons</a>
+          </figcaption>
+        </figure>
+      )}
+
       <div className="numbers">
         {l.numbers.map((n, i) => (
           <div key={n.label}>
