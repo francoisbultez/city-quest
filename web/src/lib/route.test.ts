@@ -1,66 +1,48 @@
 import { describe, expect, it } from 'vitest'
-import { madridBear } from '../content/madrid-bear'
-import { buildRoute, distanceM, normalize, routeMinutes } from './route'
+import { solRoute } from '../content/madrid-sol'
+import { distanceM, heatFor, isAtStop, routeKm } from './route'
 
-const nodes = madridBear.nodes
+const stops = solRoute.stops
 
 describe('distanceM', () => {
   it('is zero for the same point', () => {
-    expect(distanceM(nodes[0].place, nodes[0].place)).toBe(0)
+    expect(distanceM(stops[0].place, stops[0].place)).toBe(0)
   })
   it('matches the Sol → Templo de Debod straight-line distance (~1.45 km)', () => {
-    const d = distanceM(nodes[0].place, nodes.at(-1)!.place)
+    const d = distanceM(stops[0].place, stops.at(-1)!.place)
     expect(d).toBeGreaterThan(1350)
     expect(d).toBeLessThan(1550)
   })
 })
 
-describe('normalize', () => {
-  it('ignores accents, case, punctuation and extra spaces', () => {
-    expect(normalize('  Kilómetro   CERO! ')).toBe('kilometro cero')
+describe('routeKm', () => {
+  it('is about 2.8 km for the Sol Route', () => {
+    expect(routeKm(stops)).toBeGreaterThan(2.4)
+    expect(routeKm(stops)).toBeLessThan(3.2)
   })
 })
 
-describe('buildRoute', () => {
-  it('keeps every stop when there is plenty of time', () => {
-    const r = buildRoute(nodes, { budgetMin: 600, pace: 'normal', stepFreeOnly: false })
-    expect(r.nodes).toHaveLength(nodes.length)
-    expect(r.fits).toBe(true)
+describe('isAtStop', () => {
+  const s = stops[0]
+  it('accepts a position at the stop', () => {
+    expect(isAtStop({ lat: s.place.lat, lng: s.place.lng, accuracy: 10 }, s)).toBe(true)
   })
-
-  it('never drops a priority-1 (story) stop, even with no time', () => {
-    const r = buildRoute(nodes, { budgetMin: 1, pace: 'normal', stepFreeOnly: false })
-    const core = nodes.filter((n) => n.priority === 1).map((n) => n.id)
-    expect(r.nodes.map((n) => n.id)).toEqual(core)
-    expect(r.fits).toBe(false)
+  it('rejects a position 300 m away', () => {
+    expect(isAtStop({ lat: s.place.lat - 0.0027, lng: s.place.lng, accuracy: 10 }, s)).toBe(false)
   })
-
-  it('drops optional (priority 3) stops before priority 2 stops', () => {
-    const full = routeMinutes(nodes, 'normal')
-    const r = buildRoute(nodes, { budgetMin: full - 1, pace: 'normal', stepFreeOnly: false })
-    expect(r.nodes.find((n) => n.priority === 3)).toBeUndefined()
-    expect(r.nodes.filter((n) => n.priority === 2).length).toBe(nodes.filter((n) => n.priority === 2).length)
+  it('forgives poor GPS only up to 50 m', () => {
+    // 90 m away with 200 m accuracy: radius 50 + slack 50 = 100 → inside
+    expect(isAtStop({ lat: s.place.lat - 0.00081, lng: s.place.lng, accuracy: 200 }, s)).toBe(true)
+    // 120 m away: outside even with huge accuracy
+    expect(isAtStop({ lat: s.place.lat - 0.00108, lng: s.place.lng, accuracy: 500 }, s)).toBe(false)
   })
+})
 
-  it('keeps the story order', () => {
-    const r = buildRoute(nodes, { budgetMin: 90, pace: 'normal', stepFreeOnly: false })
-    const order = r.nodes.map((n) => nodes.indexOf(n))
-    expect(order).toEqual([...order].sort((a, b) => a - b))
-  })
-
-  it('removes stops with stairs for a step-free route', () => {
-    const r = buildRoute(nodes, { budgetMin: 600, pace: 'normal', stepFreeOnly: true })
-    expect(r.nodes.every((n) => n.stepFree)).toBe(true)
-    expect(r.nodes.find((n) => n.id === 'cuchilleros')).toBeUndefined()
-  })
-
-  it('a slower pace takes longer', () => {
-    expect(routeMinutes(nodes, 'relaxed')).toBeGreaterThan(routeMinutes(nodes, 'brisk'))
-  })
-
-  it('always offers a route that fits the shortest budget in the UI (95 min), at any pace', () => {
-    for (const pace of ['relaxed', 'normal', 'brisk'] as const) {
-      expect(buildRoute(nodes, { budgetMin: 95, pace, stepFreeOnly: false }).fits).toBe(true)
-    }
+describe('heatFor', () => {
+  it('goes cold → hot as you get closer', () => {
+    expect(heatFor(900)).toBe('cold')
+    expect(heatFor(300)).toBe('cool')
+    expect(heatFor(130)).toBe('warm')
+    expect(heatFor(40)).toBe('hot')
   })
 })

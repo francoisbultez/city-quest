@@ -1,40 +1,38 @@
-export type Question =
-  | { kind: 'choice'; prompt: string; options: string[]; answer: string }
-  | { kind: 'text'; prompt: string; answers: string[] }
+export interface Place {
+  name: string
+  lat: number
+  lng: number
+  /** Check-in radius in metres. */
+  radiusM: number
+}
 
-/** One stop in a hunt. Hunts are graphs of these nodes so routes can adapt. */
-export interface ClueNode {
+/** One stop on a route: a riddle to walk to, then a quiz on the spot. */
+export interface Stop {
   id: string
-  title: string
-  place: { name: string; lat: number; lng: number; radiusM: number }
-  /** Time spent at the stop, excluding walking. */
-  minutes: number
-  /** 1 = core to the story (never dropped), 3 = optional detour. */
-  priority: 1 | 2 | 3
-  stepFree: boolean
-  /** Story beat shown when the player is sent to this stop. */
-  lead: string
-  question: Question
+  place: Place
+  /** Short riddle shown while walking. */
+  riddle: string
+  /** Free location hint while walking (no points lost). */
+  whereHint: string
+  /** Small instruction above the quiz question. */
+  look: string
+  question: string
+  options: [string, string, string, string]
+  answer: string
+  /** Quiz hint (costs points). */
   hint: string
-  /** Revealed once solved. */
-  reveal: string
+  /** Shown after a correct answer. */
+  fact: string
   verification: { status: 'draft' | 'verified'; date?: string }
 }
 
-export interface Hunt {
+export interface Route {
   id: string
   city: string
-  title: string
+  /** e.g. "The Sol Route" */
+  name: string
+  /** e.g. "SOL → DEBOD", printed on the badge */
+  badgeLine: string
   tagline: string
-  intro: string
-  outro: string
-  nodes: ClueNode[]
-}
-
-export type Pace = 'relaxed' | 'normal' | 'brisk'
-
-export interface Settings {
-  budgetMin: number
-  pace: Pace
-  stepFreeOnly: boolean
+  stops: Stop[]
 }

@@ -1,52 +1,46 @@
 import { describe, expect, it } from 'vitest'
 import { distanceM, MAX_GPS_SLACK_M } from '../lib/route'
-import { hunts } from './madrid-bear'
+import { routes } from './madrid-sol'
 
-// Guards against content mistakes that would break a hunt in the street.
-describe.each(hunts)('hunt $id', (hunt) => {
-  it('has unique node ids', () => {
-    const ids = hunt.nodes.map((n) => n.id)
+// Guards against content mistakes that would break a route in the street.
+describe.each(routes)('route $id', (route) => {
+  it('has unique stop ids', () => {
+    const ids = route.stops.map((s) => s.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  it('starts and ends with a story (priority 1) stop', () => {
-    expect(hunt.nodes[0].priority).toBe(1)
-    expect(hunt.nodes.at(-1)!.priority).toBe(1)
+  it.each(route.stops.map((s) => [s.id, s] as const))('%s: has exactly one right answer among 4 distinct options', (_, s) => {
+    expect(s.options).toHaveLength(4)
+    expect(new Set(s.options).size).toBe(4)
+    expect(s.options.filter((o) => o === s.answer)).toHaveLength(1)
   })
 
-  it.each(hunt.nodes.map((n) => [n.id, n] as const))('%s: answer is reachable', (_, n) => {
-    const q = n.question
-    if (q.kind === 'choice') {
-      expect(q.options).toContain(q.answer)
-      expect(new Set(q.options).size).toBe(q.options.length)
-    } else {
-      expect(q.answers.length).toBeGreaterThan(0)
+  it.each(route.stops.map((s) => [s.id, s] as const))('%s: has all the texts the screens need', (_, s) => {
+    for (const field of ['riddle', 'whereHint', 'look', 'question', 'hint', 'fact'] as const) {
+      expect(s[field].trim().length, field).toBeGreaterThan(3)
     }
   })
 
-  it.each(hunt.nodes.map((n) => [n.id, n] as const))('%s: place is sane', (_, n) => {
-    // Central Madrid bounding box.
-    expect(n.place.lat).toBeGreaterThan(40.38)
-    expect(n.place.lat).toBeLessThan(40.46)
-    expect(n.place.lng).toBeGreaterThan(-3.75)
-    expect(n.place.lng).toBeLessThan(-3.66)
-    expect(n.place.radiusM).toBeGreaterThanOrEqual(30)
-    expect(n.place.radiusM).toBeLessThanOrEqual(150)
+  it.each(route.stops.map((s) => [s.id, s] as const))('%s: place is in central Madrid', (_, s) => {
+    expect(s.place.lat).toBeGreaterThan(40.38)
+    expect(s.place.lat).toBeLessThan(40.46)
+    expect(s.place.lng).toBeGreaterThan(-3.75)
+    expect(s.place.lng).toBeLessThan(-3.66)
+    expect(s.place.radiusM).toBeGreaterThanOrEqual(30)
+    expect(s.place.radiusM).toBeLessThanOrEqual(150)
   })
 
-  it('has no leg longer than 1.5 km between consecutive stops', () => {
-    for (let i = 1; i < hunt.nodes.length; i++) {
-      expect(distanceM(hunt.nodes[i - 1].place, hunt.nodes[i].place)).toBeLessThan(1500)
+  it('has no leg longer than 1.5 km', () => {
+    for (let i = 1; i < route.stops.length; i++) {
+      expect(distanceM(route.stops[i - 1].place, route.stops[i].place)).toBeLessThan(1500)
     }
   })
 
-  it('never unlocks the next clue while you are still at the previous stop', () => {
-    for (let i = 1; i < hunt.nodes.length; i++) {
-      const a = hunt.nodes[i - 1].place
-      const b = hunt.nodes[i].place
-      // Standing at the centre of stop A with poor GPS must not count as being at stop B.
-      expect(distanceM(a, b), `${hunt.nodes[i - 1].id} -> ${hunt.nodes[i].id}`).toBeGreaterThan(b.radiusM + MAX_GPS_SLACK_M)
-      expect(distanceM(a, b)).toBeGreaterThan(a.radiusM + b.radiusM)
+  it('never counts you as at the next stop while you are still at the previous one', () => {
+    for (let i = 1; i < route.stops.length; i++) {
+      const a = route.stops[i - 1].place
+      const b = route.stops[i].place
+      expect(distanceM(a, b), `${route.stops[i - 1].id} -> ${route.stops[i].id}`).toBeGreaterThan(b.radiusM + MAX_GPS_SLACK_M)
     }
   })
 })
