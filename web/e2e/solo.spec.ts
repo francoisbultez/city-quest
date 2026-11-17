@@ -177,11 +177,6 @@ test('pause menu: report a problem, then leave the route', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Start at the Puerta del Sol' })).toBeVisible()
 })
 
-test('Together is shown but not playable yet', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByRole('button', { name: /Together/ })).toBeDisabled()
-  await expect(page.getByText('Coming soon')).toBeVisible()
-})
 
 test('test mode lets you teleport to each stop', async ({ page, context }) => {
   await context.setGeolocation(FAR_AWAY)

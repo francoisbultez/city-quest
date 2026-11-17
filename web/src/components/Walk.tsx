@@ -4,7 +4,8 @@ import { distanceM, heatFor, isAtStop } from '../lib/route'
 import { load, save } from '../lib/storage'
 import { useGeolocation, type Position } from '../lib/useGeolocation'
 import type { Stop } from '../types'
-import { RouteMap } from './RouteMap'
+import { teamNote } from '../lib/team/logic'
+import { RouteMap, type Mate } from './RouteMap'
 import { TopBar } from './TopBar'
 
 const HEAT_LABEL = { cold: 'Cold', cool: 'Cool', warm: 'Warm', hot: 'Hot' } as const
@@ -26,9 +27,12 @@ interface Props {
   points: number
   onArrive: () => void
   onPause: () => void
+  /** Together mode: teammates on the map, and this phone's position reported back. */
+  mates?: Mate[]
+  onPosition?: (p: Position) => void
 }
 
-export function Walk({ stops, index, points, onArrive, onPause }: Props) {
+export function Walk({ stops, index, points, onArrive, onPause, mates, onPosition }: Props) {
   const stop = stops[index]
   const gps = useGeolocation()
   const [testMode] = useState(readTestMode)
@@ -46,11 +50,17 @@ export function Walk({ stops, index, points, onArrive, onPause }: Props) {
     wasHere.current = here
   }, [here])
 
+  useEffect(() => {
+    if (pos) onPosition?.(pos)
+  }, [pos, onPosition])
+
+  const note = mates ? teamNote(dist, mates.map((m) => ({ name: m.name, dist: m.pos ? distanceM(m.pos, stop.place) : null }))) : null
+
   const d = dist !== null ? formatDistance(dist) : null
 
   return (
     <main className="walk">
-      <RouteMap stops={stops} current={index} pos={pos} />
+      <RouteMap stops={stops} current={index} pos={pos} mates={mates} />
       <TopBar index={index} total={stops.length} points={points} onPause={onPause} />
 
       <section className={here ? 'walk-card here' : 'walk-card'} key={stop.id}>
@@ -67,6 +77,7 @@ export function Walk({ stops, index, points, onArrive, onPause }: Props) {
           </>
         ) : (
           <>
+            {mates && <span className="label team-label">Team riddle</span>}
             <p className="riddle">“{stop.riddle}”</p>
             {showWhere && <p className="where">{stop.whereHint}</p>}
             <div className="distance-row">
@@ -82,6 +93,7 @@ export function Walk({ stops, index, points, onArrive, onPause }: Props) {
                 </span>
               )}
             </div>
+            {note && <p className="team-note">{note}</p>}
             <div className="row-buttons">
               <button className="btn soft" onClick={() => setShowWhere(true)} disabled={showWhere}>Where is it?</button>
               <button className="btn soft" onClick={onArrive}>I’m here</button>

@@ -1,14 +1,18 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { End } from './components/End'
 import { Home } from './components/Home'
 import { Lesson } from './components/Lesson'
 import { Modal } from './components/Modal'
 import { Quiz } from './components/Quiz'
 import { Walk } from './components/Walk'
+import { Team } from './components/team/Team'
+import { TeamJoin } from './components/team/TeamJoin'
 import { routes } from './content/madrid-sol'
 import { currentStreak, isPerfect, starsFor, stopPoints } from './lib/game'
 import { awardBadge, loadBadges, loadSession, newSession, saveSession, sessionPoints, type Session } from './lib/session'
 import { reportClue } from './lib/storage'
+import { loadName, loadTeam, openRoom, saveTeam } from './lib/team/room'
+import type { Room } from './lib/team/types'
 
 const REASONS = ['Can’t find it', 'Answer looks wrong', 'Covered or closed', 'Other']
 
@@ -21,6 +25,27 @@ export default function App() {
   const [reason, setReason] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [review, setReview] = useState<number | null>(null)
+  // Together mode: `?team=CODE` opens the join screen with the code filled in.
+  const [inviteCode] = useState(() => new URLSearchParams(window.location.search).get('team') ?? '')
+  const [teamView, setTeamView] = useState<'join' | 'play' | null>(() => (inviteCode ? 'join' : null))
+  const [teamCode, setTeamCode] = useState(() => loadTeam()?.code ?? null)
+  const [room, setRoom] = useState<Room | null>(null)
+  const [homeMode, setHomeMode] = useState<'solo' | 'team'>(inviteCode || loadTeam() ? 'team' : 'solo')
+  const onBadges = useCallback((b: typeof badges) => setBadges(b), [])
+
+  // Reconnect to the team after a reload.
+  useEffect(() => {
+    if (teamView !== 'play' || room || !teamCode) return
+    let cancelled = false
+    openRoom(teamCode, loadName()).then((r) => {
+      if (!cancelled) setRoom(r)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [teamView, room, teamCode])
+  useEffect(() => () => room?.close(), [room])
+
   const answers = Object.fromEntries(route.stops.map((st) => [st.id, st.lesson.check.answer]))
 
   const update = (s: Session | null) => {
@@ -32,9 +57,51 @@ export default function App() {
     setTimeout(() => setToast(null), 2500)
   }
 
+  if (teamView === 'join') {
+    return (
+      <TeamJoin
+        route={route}
+        initialCode={inviteCode}
+        onBack={() => setTeamView(null)}
+        onJoined={(r) => {
+          saveTeam({ code: r.code })
+          setTeamCode(r.code)
+          setRoom(r)
+          setTeamView('play')
+          if (inviteCode) window.history.replaceState(null, '', window.location.pathname)
+        }}
+      />
+    )
+  }
+  if (teamView === 'play') {
+    if (!room) return <main className="team-loading"><p>Connecting to your team…</p></main>
+    return (
+      <Team
+        key={room.code}
+        route={route}
+        room={room}
+        onBadges={onBadges}
+        onExit={(left) => {
+          if (left) {
+            saveTeam(null)
+            setTeamCode(null)
+            room.close()
+            setRoom(null)
+          }
+          setHomeMode('team')
+          setTeamView(null)
+        }}
+      />
+    )
+  }
+
   if (atHome || !session) {
     return (
       <Home
+        key={homeMode}
+        initialMode={homeMode}
+        team={teamCode}
+        onTogether={() => setTeamView(teamCode ? 'play' : 'join')}
         route={route}
         badges={badges}
         session={session}

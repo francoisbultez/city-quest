@@ -27,7 +27,17 @@ function FollowTarget({ target }: { target: Stop }) {
 const doneIcon = L.divIcon({ className: '', html: '<div class="pin-done">✓</div>', iconSize: [22, 22], iconAnchor: [11, 11] })
 const meIcon = L.divIcon({ className: '', html: '<div class="me"></div>', iconSize: [20, 20], iconAnchor: [10, 10] })
 
-export function RouteMap({ stops, current, pos }: { stops: Stop[]; current: number; pos: Position | null }) {
+export interface Mate {
+  id: string
+  name: string
+  color: string
+  pos: { lat: number; lng: number } | null
+}
+
+const mateIcon = (m: Mate) =>
+  L.divIcon({ className: '', html: `<div class="mate" style="background:${m.color}">${m.name.slice(0, 1).toUpperCase()}</div>`, iconSize: [28, 28], iconAnchor: [14, 14] })
+
+export function RouteMap({ stops, current, pos, mates = [] }: { stops: Stop[]; current: number; pos: Position | null; mates?: Mate[] }) {
   const target = stops[current]
   const currentIcon = useMemo(
     () => L.divIcon({ className: '', html: `<div class="pin">${current + 1}</div>`, iconSize: [44, 44], iconAnchor: [22, 22] }),
@@ -62,6 +72,9 @@ export function RouteMap({ stops, current, pos }: { stops: Stop[]; current: numb
           <Marker position={[pos.lat, pos.lng]} icon={meIcon} interactive={false} />
         </>
       )}
+      {mates.filter((m) => m.pos).map((m) => (
+        <Marker key={m.id} position={[m.pos!.lat, m.pos!.lng]} icon={mateIcon(m)} title={m.name} interactive={false} />
+      ))}
       <FollowTarget target={target} />
     </MapContainer>
   )
