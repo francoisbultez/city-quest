@@ -1,5 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CHECK_BONUS } from '../lib/game'
+import { lessonScript } from '../lib/lessonScript'
+import { speak, speechSupported } from '../lib/speech'
 import type { Stop } from '../types'
 
 interface Result {
@@ -36,6 +38,29 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
     window.scrollTo(0, 0)
   }, [stop.id])
 
+  // Read the lesson aloud with the phone's built-in voice.
+  const [canListen] = useState(speechSupported)
+  const [playing, setPlaying] = useState(false)
+  const stopRef = useRef<(() => void) | null>(null)
+  useEffect(() => () => stopRef.current?.(), [])
+  const toggleListen = () => {
+    if (playing) {
+      stopRef.current?.()
+      return
+    }
+    setPlaying(true)
+    stopRef.current = speak(lessonScript(stop), {
+      onEnd: () => {
+        setPlaying(false)
+        stopRef.current = null
+      },
+    })
+  }
+  const act = (fn?: () => void) => () => {
+    stopRef.current?.()
+    fn?.()
+  }
+
   return (
     <main className="lesson">
       {result ? (
@@ -49,13 +74,19 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
           </div>
         </div>
       ) : (
-        <button className="back" onClick={onBack} aria-label="Back to my badge">←</button>
+        <button className="back" onClick={act(onBack)} aria-label="Back to my badge">←</button>
       )}
 
       <header className="lesson-head">
         <div className="tags">
           <span className="chip">Stop {index + 1} of {total}</span>
           <span className="chip">2-minute read</span>
+          {canListen && (
+            <button className={playing ? 'chip listen on' : 'chip listen'} onClick={toggleListen} aria-pressed={playing}>
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24">{playing ? <><rect x="5" y="4" width="5" height="16" rx="1.5" /><rect x="14" y="4" width="5" height="16" rx="1.5" /></> : <path d="M7 4.5v15l13-7.5z" />}</svg>
+              {playing ? 'Stop' : 'Listen'}
+            </button>
+          )}
         </div>
         <h1>{l.title}</h1>
         <p>{l.subtitle}</p>
@@ -175,8 +206,9 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
       </section>
 
       <div className="lesson-cta">
-        <button className="btn primary" onClick={onAction}>{actionLabel}</button>
+        <button className="btn primary" onClick={act(onAction)}>{actionLabel}</button>
       </div>
     </main>
   )
 }
+

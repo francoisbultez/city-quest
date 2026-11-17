@@ -271,3 +271,8 @@ h1, h2 { margin: 0; letter-spacing: -0.045em; text-wrap: balance; }
 .recap .thumb { position: relative; width: 48px; height: 48px; flex: none; }
 .recap .thumb img { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; display: block; background: var(--soft); }
 .recap .thumb i { position: absolute; left: -6px; top: -6px; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; border: 2px solid #fff; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 700; }
+
+/* ---------- Listen ---------- */
+.chip.listen { display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--ink); color: #fff; }
+.chip.listen svg { fill: currentColor; }
+.chip.listen.on { background: var(--accent); }

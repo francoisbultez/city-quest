@@ -211,3 +211,51 @@ test('keeps working offline once loaded', async ({ page, context }) => {
   await expect(page.getByRole('heading', { name: stops[0].question })).toBeVisible()
   await context.setOffline(false)
 })
+
+test('Listen reads the lesson aloud and stops when you move on', async ({ page }) => {
+  // Headless browsers have no voices: stand in for speechSynthesis and record what is spoken.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __spoken: string[]; __cancelled: number }
+    w.__spoken = []
+    w.__cancelled = 0
+    class FakeUtterance {
+      text: string
+      lang = ''
+      rate = 1
+      voice: unknown = null
+      onend: (() => void) | null = null
+      onerror: (() => void) | null = null
+      constructor(t: string) { this.text = t }
+    }
+    let pending: FakeUtterance | null = null
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: FakeUtterance, configurable: true })
+    Object.defineProperty(window, 'speechSynthesis', {
+      configurable: true,
+      value: {
+        getVoices: () => [],
+        cancel: () => { w.__cancelled++; pending = null },
+        // Each sentence "finishes" after a short delay, unless cancelled.
+        speak: (u: FakeUtterance) => { w.__spoken.push(u.text); pending = u; setTimeout(() => { if (pending === u) u.onend?.() }, 150) },
+      },
+    })
+  })
+  await start(page)
+  await arriveAndOpenQuiz(page, stops[0])
+  await page.getByRole('button', { name: stops[0].answer, exact: true }).click()
+
+  const listen = page.getByRole('button', { name: 'Listen' })
+  await listen.click()
+  await expect(page.getByRole('button', { name: 'Stop' })).toHaveAttribute('aria-pressed', 'true')
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __spoken: string[] }).__spoken.length)).toBeGreaterThan(2)
+  const spoken = await page.evaluate(() => (window as unknown as { __spoken: string[] }).__spoken.join(' '))
+  expect(spoken).toContain(stops[0].lesson.title)
+
+  await page.getByRole('button', { name: 'Stop' }).click()
+  await expect(page.getByRole('button', { name: 'Listen' })).toBeVisible()
+
+  // Moving on stops any reading.
+  await page.getByRole('button', { name: 'Listen' }).click()
+  const before = await page.evaluate(() => (window as unknown as { __cancelled: number }).__cancelled)
+  await page.getByRole('button', { name: 'Next riddle' }).click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __cancelled: number }).__cancelled)).toBeGreaterThan(before)
+})
