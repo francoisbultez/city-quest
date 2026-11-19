@@ -1,40 +1,43 @@
 import { expect, test } from '@playwright/test'
-import { routeFile } from './routes'
-import type { Stop } from '../src/types'
+import { builtInIds, routeFile } from './routes'
+import type { Route, Stop } from '../src/types'
 
-const useraRoute = routeFile('madrid-usera')
 const at = (s: Stop) => ({ latitude: s.place.lat, longitude: s.place.lng, accuracy: 10 })
+const label = (r: Route) => `${r.name.replace(/^The /, '').replace(/ Route$/, '')} ${r.city}`
 
-test('pick the Usera route and play it through', async ({ page, context }) => {
-  const errors: string[] = []
-  page.on('pageerror', (e) => errors.push(e.message))
-  await context.setGeolocation(at(useraRoute.stops[0]))
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Usera', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Madrid · The Usera Route' })).toBeVisible()
-  await expect(page.getByText('~1.5 h')).toBeVisible()
-  await page.getByRole('button', { name: 'Start at Usera metro' }).click()
+// Every built-in route can be picked and played to the end.
+for (const id of builtInIds()) {
+  const route = routeFile(id)
+  test(`pick ${route.city} · ${route.name} and play it through`, async ({ page, context }) => {
+    const errors: string[] = []
+    page.on('pageerror', (e) => errors.push(e.message))
+    await context.setGeolocation(at(route.stops[0]))
+    await page.goto('/')
+    await page.getByRole('button', { name: label(route), exact: true }).click()
+    await expect(page.getByRole('heading', { name: `${route.city} · ${route.name}` })).toBeVisible()
+    await expect(page.getByText(route.duration, { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: `Start at ${route.start}` }).click()
 
-  for (const [i, s] of useraRoute.stops.entries()) {
-    await context.setGeolocation(at(s))
-    await page.getByRole('button', { name: 'Open the quiz' }).click()
-    await expect(page.getByRole('heading', { name: s.question })).toBeVisible()
-    await page.getByRole('button', { name: s.answer, exact: true }).click()
-    await expect(page.getByRole('heading', { level: 1, name: s.lesson.title })).toBeVisible()
-    await page.getByRole('button', { name: i === useraRoute.stops.length - 1 ? 'See my badge' : 'Next riddle' }).click()
-  }
-  await expect(page.getByText('New badge unlocked')).toBeVisible()
-  await expect(page.getByTestId('final-score')).toHaveText('700')
-  await expect(page.getByRole('img', { name: /THE USERA ROUTE/ })).toBeVisible()
+    for (const [i, s] of route.stops.entries()) {
+      await context.setGeolocation(at(s))
+      await page.getByRole('button', { name: 'Open the quiz' }).click()
+      await expect(page.getByRole('heading', { name: s.question })).toBeVisible()
+      await page.locator('.options button').nth(s.options.indexOf(s.answer)).click()
+      await expect(page.getByRole('heading', { level: 1, name: s.lesson.title })).toBeVisible()
+      if (s.lesson.image) await expect(page.locator('.lesson-photo img')).toHaveJSProperty('complete', true)
+      await page.getByRole('button', { name: i === route.stops.length - 1 ? 'See my badge' : 'Next riddle' }).click()
+    }
+    await expect(page.getByText('New badge unlocked')).toBeVisible()
+    await expect(page.getByTestId('final-score')).toHaveText(String(route.stops.length * 100))
+    await expect(page.getByRole('img', { name: new RegExp(route.badgeLine) })).toBeVisible()
 
-  // The choice is remembered, and each route keeps its own badge.
-  await page.getByRole('button', { name: 'Back to start' }).click()
-  await expect(page.getByRole('heading', { name: 'Madrid · The Usera Route' })).toBeVisible()
-  await expect(page.getByText('Your badge')).toBeVisible()
-  await page.getByRole('button', { name: 'Sol', exact: true }).click()
-  await expect(page.getByText('Earn this badge')).toBeVisible()
-  expect(errors).toEqual([])
-})
+    // The choice is remembered and the route now shows its badge.
+    await page.getByRole('button', { name: 'Back to start' }).click()
+    await expect(page.getByRole('heading', { name: `${route.city} · ${route.name}` })).toBeVisible()
+    await expect(page.getByText('Your badge')).toBeVisible()
+    expect(errors).toEqual([])
+  })
+}
 
 const LINK = 'https://routes.example.org/lisbon-tiny/route.json'
 const tinyRoute = {
@@ -97,7 +100,7 @@ test('add a route someone else made, from a link', async ({ page, context }) => 
 
   // Still there after a reload, without the link.
   await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Tiny Tram', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Tiny Tram Lisboa', exact: true })).toBeVisible()
 })
 
 test('a broken route file is refused with the reason', async ({ page, context }) => {
@@ -106,5 +109,5 @@ test('a broken route file is refused with the reason', async ({ page, context })
   await context.route(LINK, (r) => r.fulfill({ json: broken, headers: { 'access-control-allow-origin': '*' } }))
   await page.goto(`/?route=${encodeURIComponent(LINK)}`)
   await expect(page.getByRole('status')).toContainText('This route file has mistakes, so it can’t be played. stops.1.answer: answer must be one of the options')
-  await expect(page.getByRole('button', { name: 'Tiny Tram', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Tiny Tram Lisboa', exact: true })).toHaveCount(0)
 })

@@ -19,6 +19,7 @@ interface Props {
 }
 
 export function Home({ route, routes, onPickRoute, badges, session, onStart, onResume, team, onTogether, initialMode = 'solo' }: Props) {
+  const multiCity = new Set(routes.map((r) => r.city)).size > 1
   const [mode, setMode] = useState<'solo' | 'team'>(initialMode)
   const earned = badges.find((b) => b.routeId === route.id && b.mode === mode)
   const inProgress = session && session.routeId === route.id && session.screen !== 'end'
@@ -35,6 +36,7 @@ export function Home({ route, routes, onPickRoute, badges, session, onStart, onR
           {routes.map((r) => (
             <button key={r.id} className={r.id === route.id ? 'on' : ''} aria-pressed={r.id === route.id} onClick={() => onPickRoute(r.id)}>
               {r.name.replace(/^The /, '').replace(/ Route$/, '')}
+              {multiCity && <small>{r.city}</small>}
             </button>
           ))}
         </div>

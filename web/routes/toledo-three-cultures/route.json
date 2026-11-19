@@ -1,0 +1,1026 @@
+{
+  "$schema": "../route.schema.json",
+  "formatVersion": 1,
+  "id": "toledo-three-cultures",
+  "language": "en",
+  "localLanguage": {
+    "code": "es",
+    "name": "Spanish"
+  },
+  "city": "Toledo",
+  "country": "ES",
+  "name": "The Three Cultures Route",
+  "badgeLine": "THREE CULTURES",
+  "tagline": "8 riddles through Christian, Muslim and Jewish Toledo, from the emperor’s gate down to the river",
+  "start": "the Puerta de Bisagra",
+  "duration": "~2.5 h",
+  "theme": {
+    "colors": [
+      "#7a1f2b",
+      "#e9dcc0"
+    ],
+    "ink": "#7a1f2b"
+  },
+  "author": {
+    "name": "City Quest"
+  },
+  "stops": [
+    {
+      "id": "bisagra",
+      "place": {
+        "name": "Puerta Nueva de Bisagra",
+        "lat": 39.8625,
+        "lng": -4.0252,
+        "radiusM": 50
+      },
+      "riddle": "An emperor guards the courtyard of the city’s great northern gate.",
+      "whereHint": "The big gate with two towers at the bottom of the hill, on Paseo de Merchán.",
+      "look": "Walk into the courtyard between the gate’s two fronts",
+      "question": "Whose statue stands in the courtyard?",
+      "options": [
+        "Emperor Charles V",
+        "King Alfonso VI",
+        "El Greco",
+        "Queen Isabella I"
+      ],
+      "answer": "Emperor Charles V",
+      "hint": "He was King Charles I of Spain, and much more.",
+      "lesson": {
+        "title": "Puerta Nueva de Bisagra",
+        "image": {
+          "src": "images/bisagra.jpg",
+          "alt": "The Puerta Nueva de Bisagra: two round towers and the imperial coat of arms",
+          "credit": {
+            "artist": "José Luis Filpo Cabana",
+            "license": "CC0",
+            "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+            "page": "https://commons.wikimedia.org/wiki/File:Puerta_Nueva_de_Bisagra_%28Toledo%29._Fachada_septentrional.jpg",
+            "site": "Wikimedia Commons"
+          }
+        },
+        "subtitle": "The front door of Toledo, rebuilt for an emperor",
+        "recap": "The emperor’s gate, rebuilt in the 1500s on a much older entrance",
+        "numbers": [
+          {
+            "value": "1540",
+            "label": "rebuilding begins"
+          },
+          {
+            "value": "2",
+            "label": "fronts, with a courtyard between"
+          },
+          {
+            "value": "1085",
+            "label": "Alfonso VI takes Toledo"
+          }
+        ],
+        "story": [
+          {
+            "lead": "Why “new”?",
+            "text": "A smaller, older gate nearby is called the Puerta Antigua de Bisagra, or Puerta de Alfonso VI. So this big one became the “new” gate."
+          },
+          {
+            "lead": "Rebuilt for an empire.",
+            "text": "It was rebuilt from about 1540 to 1576, with the architect Alonso de Covarrubias among its masters. It has two separate fronts joined by battlemented walls, with a courtyard in between where the statue of Charles V stands."
+          },
+          {
+            "lead": "Older underneath.",
+            "text": "Its Muslim name was “bab a Ssaqra”. A 1999 excavation found that the Renaissance gate sits on an older, bent entrance from before 1085, when Alfonso VI took the city."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "1085",
+            "text": "Alfonso VI of Castile takes Toledo"
+          },
+          {
+            "year": "1540",
+            "text": "The gate is rebuilt, until about 1576"
+          },
+          {
+            "year": "1999",
+            "text": "Excavations find the older bent entrance underneath"
+          }
+        ],
+        "context": {
+          "title": "The city of three cultures",
+          "text": "For centuries Christians, Muslims and Jews lived side by side in Toledo. You’ll see all three in its buildings today: a mosque turned chapel, a minaret turned bell tower, and churches built by Muslim craftsmen."
+        },
+        "lookCloser": [
+          {
+            "title": "The eagle.",
+            "text": "Look for the emperor’s double-headed eagle on the gate."
+          },
+          {
+            "title": "Two fronts.",
+            "text": "Stand in the courtyard and turn around: there is a gate on each side."
+          }
+        ],
+        "words": [
+          {
+            "word": "puerta",
+            "meaning": "gate, door"
+          },
+          {
+            "word": "muralla",
+            "meaning": "city wall"
+          },
+          {
+            "word": "emperador",
+            "meaning": "emperor"
+          }
+        ],
+        "think": "Why would a city build a grand gate when it no longer needed walls for defence?",
+        "check": {
+          "question": "Why is this gate called “new”?",
+          "options": [
+            "An older gate stands nearby",
+            "It was built last year",
+            "It replaced a bridge"
+          ],
+          "answer": "An older gate stands nearby"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Puerta Nueva de Bisagra",
+            "url": "https://es.wikipedia.org/wiki/Puerta_Nueva_de_Bisagra"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cristo-de-la-luz",
+      "place": {
+        "name": "Mezquita del Cristo de la Luz",
+        "lat": 39.86056,
+        "lng": -4.02425,
+        "radiusM": 40
+      },
+      "riddle": "Climb through the Gate of the Sun to a small mosque that has kept its birthday for a thousand years.",
+      "whereHint": "Calle Cristo de la Luz, just above the Puerta del Sol gate.",
+      "look": "Find the inscription on the façade",
+      "question": "What is the mosque’s building inscription made of?",
+      "options": [
+        "Pieces of brick",
+        "Marble letters",
+        "Glazed tiles",
+        "Carved wood"
+      ],
+      "answer": "Pieces of brick",
+      "hint": "The same humble material as the walls.",
+      "lesson": {
+        "title": "Mezquita del Cristo de la Luz",
+        "image": {
+          "src": "images/cristo-de-la-luz.jpg",
+          "alt": "The brick façade of the Cristo de la Luz mosque, with its arches",
+          "credit": {
+            "artist": "Fernando",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+            "page": "https://commons.wikimedia.org/wiki/File:Cristo_de_la_Luz_2025_Fa%C3%A7ade.jpg",
+            "site": "Wikimedia Commons"
+          }
+        },
+        "subtitle": "A mosque from the year 999, and its birth certificate on the wall",
+        "recap": "The best-preserved of Toledo’s ten mosques, dated 999",
+        "numbers": [
+          {
+            "value": "999",
+            "label": "the year it was built"
+          },
+          {
+            "value": "10",
+            "label": "mosques Toledo once had"
+          },
+          {
+            "value": "1889",
+            "label": "the inscription is found"
+          }
+        ],
+        "story": [
+          {
+            "lead": "A dated building.",
+            "text": "The inscription on the façade says who paid for it (Ahmad ibn Hadidi), who designed it (Musa ibn Ali) and when: December 999. It was rediscovered in 1889."
+          },
+          {
+            "lead": "Made of bricks.",
+            "text": "The letters are made only from pieces of ordinary brick, which makes it unique in the Islamic West."
+          },
+          {
+            "lead": "Then a chapel.",
+            "text": "After the Christian conquest of 1085, a Romanesque-Mudéjar apse was added around 1187, one of the oldest examples of that style."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "999",
+            "text": "The mosque is built"
+          },
+          {
+            "year": "1085",
+            "text": "Toledo becomes Christian; the mosque becomes a chapel"
+          },
+          {
+            "year": "1187",
+            "text": "A Romanesque-Mudéjar apse is added"
+          },
+          {
+            "year": "1889",
+            "text": "The brick inscription is rediscovered"
+          }
+        ],
+        "context": {
+          "title": "What is Mudéjar?",
+          "text": "Mudéjar is the style of Muslim craftsmen working for Christian patrons after the conquest: brick, arches and geometric patterns on churches and towers. It mixes two cultures in one building."
+        },
+        "lookCloser": [
+          {
+            "title": "The arches.",
+            "text": "Count the different arch shapes on the façade."
+          },
+          {
+            "title": "Two colours.",
+            "text": "Notice the red brick and stone in the walls."
+          }
+        ],
+        "words": [
+          {
+            "word": "mezquita",
+            "meaning": "mosque"
+          },
+          {
+            "word": "ladrillo",
+            "meaning": "brick"
+          },
+          {
+            "word": "luz",
+            "meaning": "light"
+          }
+        ],
+        "think": "If your house had a sign saying who built it and when, what would you want it to say?",
+        "check": {
+          "question": "In which year was the mosque built?",
+          "options": [
+            "999",
+            "1492",
+            "1085"
+          ],
+          "answer": "999"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Cristo de la Luz",
+            "url": "https://es.wikipedia.org/wiki/Cristo_de_la_Luz"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zocodover",
+      "place": {
+        "name": "Plaza de Zocodover",
+        "lat": 39.85946,
+        "lng": -4.02138,
+        "radiusM": 45
+      },
+      "riddle": "Its name still remembers the donkeys and mules that were once sold here.",
+      "whereHint": "Toledo’s main square, at the top of the hill.",
+      "look": "Look around the edges of the square",
+      "question": "Which arch opens off this square?",
+      "options": [
+        "Arco de la Sangre",
+        "Arco de Triunfo",
+        "Arco de Cuchilleros",
+        "Arco de la Estrella"
+      ],
+      "answer": "Arco de la Sangre",
+      "hint": "Its name means “the Arch of Blood”.",
+      "lesson": {
+        "title": "Plaza de Zocodover",
+        "image": {
+          "src": "images/zocodover.jpg",
+          "alt": "Plaza de Zocodover with its arcaded buildings",
+          "credit": {
+            "artist": "Palickap",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+            "page": "https://commons.wikimedia.org/wiki/File:Toledo%2C_Plaza_Zocodover_01.jpg",
+            "site": "Wikimedia Commons"
+          }
+        },
+        "subtitle": "From an animal market to Toledo’s living room",
+        "recap": "Toledo’s main square, once a market for pack animals",
+        "numbers": [
+          {
+            "value": "1589",
+            "label": "a fire destroys the old square"
+          },
+          {
+            "value": "1502",
+            "label": "a plan to widen it"
+          },
+          {
+            "value": "1",
+            "label": "word from Arabic: zoco, market"
+          }
+        ],
+        "story": [
+          {
+            "lead": "A market for beasts.",
+            "text": "The name comes from the Arabic “sūq ad-dawābb”, the market of beasts of burden. Donkeys, mules and horses were traded here."
+          },
+          {
+            "lead": "Bulls and trials.",
+            "text": "Bulls were run in the square, and the Inquisition held its autos-da-fé and public executions here."
+          },
+          {
+            "lead": "Fire and rebuilding.",
+            "text": "In 1502 Queen Isabella approved a plan to widen the square all the way to the Alcázar; it never happened. After a fire on 29 October 1589, a new square was built, partly designed by Juan de Herrera under Philip II."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "1502",
+            "text": "Isabella I approves a plan to widen the square"
+          },
+          {
+            "year": "1589",
+            "text": "A fire destroys the old square"
+          },
+          {
+            "year": "1590s",
+            "text": "It is rebuilt, partly to Juan de Herrera’s design"
+          }
+        ],
+        "context": {
+          "title": "Arabic in Spanish",
+          "text": "Spanish has thousands of words from Arabic, from almost eight centuries of Muslim rule in parts of Spain: zoco (market), aceite (oil), azúcar (sugar), almohada (pillow)."
+        },
+        "lookCloser": [
+          {
+            "title": "Arcades.",
+            "text": "Look for the covered walkways around the square."
+          },
+          {
+            "title": "The view.",
+            "text": "Find where you can glimpse the Alcázar’s towers from here."
+          }
+        ],
+        "words": [
+          {
+            "word": "plaza",
+            "meaning": "square"
+          },
+          {
+            "word": "zoco",
+            "meaning": "market (from Arabic)"
+          },
+          {
+            "word": "arco",
+            "meaning": "arch"
+          }
+        ],
+        "think": "What would your town’s main square be named after if it were named for what happens there today?",
+        "check": {
+          "question": "What was sold here, according to the square’s name?",
+          "options": [
+            "Pack animals",
+            "Swords",
+            "Books"
+          ],
+          "answer": "Pack animals"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Plaza de Zocodover",
+            "url": "https://es.wikipedia.org/wiki/Plaza_de_Zocodover"
+          }
+        ]
+      },
+      "verification": {
+        "status": "draft"
+      }
+    },
+    {
+      "id": "alcazar",
+      "place": {
+        "name": "Alcázar de Toledo",
+        "lat": 39.85806,
+        "lng": -4.02056,
+        "radiusM": 50
+      },
+      "riddle": "A square fortress watches over the whole city from the highest point.",
+      "whereHint": "The huge square building just south of Zocodover.",
+      "look": "Look at the corners of the building",
+      "question": "How many corner towers does it have?",
+      "options": [
+        "Two",
+        "Four",
+        "Six",
+        "Eight"
+      ],
+      "answer": "Four",
+      "hint": "One for each corner of a square.",
+      "lesson": {
+        "title": "Alcázar de Toledo",
+        "image": {
+          "src": "images/alcazar.jpg",
+          "alt": "Toledo on its hill, with the square Alcázar and its towers on the skyline",
+          "credit": {
+            "artist": "christopher_brown",
+            "license": "CC BY 2.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+            "page": "https://commons.wikimedia.org/wiki/File:Alc%C3%A1zar_de_Toledo_%2815721597899%29.jpg",
+            "site": "Wikimedia Commons"
+          },
+          "position": "25% 35%"
+        },
+        "subtitle": "A Roman palace, a royal fortress and now a museum",
+        "recap": "A square fortress, 60 m a side, restored by Charles V",
+        "numbers": [
+          {
+            "value": "60 m",
+            "label": "on each side"
+          },
+          {
+            "value": "4",
+            "label": "towers with slate spires"
+          },
+          {
+            "value": "1528",
+            "label": "Hernán Cortés visits"
+          }
+        ],
+        "story": [
+          {
+            "lead": "A fortress name.",
+            "text": "“Alcázar” comes from the Arabic al-qasr, fortress. In the 3rd century there was a Roman palace on this spot."
+          },
+          {
+            "lead": "An emperor’s fortress.",
+            "text": "Charles V and his son Philip II restored it in the 1540s. It is a perfect square, 60 metres on each side, with four towers topped by slate spires."
+          },
+          {
+            "lead": "A famous visitor.",
+            "text": "In July 1528 Charles V received Hernán Cortés here, after the conquest of the Aztec Empire."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "200s",
+            "text": "A Roman palace stands on the hilltop"
+          },
+          {
+            "year": "1528",
+            "text": "Charles V receives Hernán Cortés"
+          },
+          {
+            "year": "1540s",
+            "text": "Charles V and Philip II restore the building"
+          }
+        ],
+        "context": {
+          "title": "Why build on the top?",
+          "text": "Toledo sits on a rocky hill in a bend of the river Tagus. The highest point could see enemies coming from every side, so whoever ruled the city built here: Romans, Visigoths, Muslims and Christians."
+        },
+        "lookCloser": [
+          {
+            "title": "The spires.",
+            "text": "The pointed slate roofs on the towers are in a “Madrid” style."
+          },
+          {
+            "title": "The river.",
+            "text": "Walk to the edge nearby and look for the Tagus below."
+          }
+        ],
+        "words": [
+          {
+            "word": "alcázar",
+            "meaning": "fortress (from Arabic)"
+          },
+          {
+            "word": "torre",
+            "meaning": "tower"
+          },
+          {
+            "word": "rey",
+            "meaning": "king"
+          }
+        ],
+        "think": "If you had to defend a city, would you rather have high walls or a high hill?",
+        "check": {
+          "question": "What does “alcázar” mean?",
+          "options": [
+            "Fortress",
+            "Church",
+            "Bridge"
+          ],
+          "answer": "Fortress"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Alcázar de Toledo",
+            "url": "https://es.wikipedia.org/wiki/Alc%C3%A1zar_de_Toledo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cathedral",
+      "place": {
+        "name": "Catedral Primada, Plaza del Ayuntamiento",
+        "lat": 39.85708,
+        "lng": -4.02389,
+        "radiusM": 50
+      },
+      "riddle": "“The rich one of Toledo” has one finished tower and one that never was.",
+      "whereHint": "Plaza del Ayuntamiento, facing the cathedral’s main front.",
+      "look": "Look at the main front, between the two towers",
+      "question": "How many great doorways are there between the towers?",
+      "options": [
+        "One",
+        "Two",
+        "Three",
+        "Five"
+      ],
+      "answer": "Three",
+      "hint": "Hell, Forgiveness and the Last Judgement each have one.",
+      "lesson": {
+        "title": "Catedral Primada",
+        "image": {
+          "src": "images/cathedral.jpg",
+          "alt": "The main front of Toledo Cathedral with its three Gothic doorways",
+          "credit": {
+            "artist": "José Luis Filpo Cabana",
+            "license": "CC BY 3.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+            "page": "https://commons.wikimedia.org/wiki/File:Catedral_de_Toledo._Fachada_principal.jpg",
+            "site": "Wikimedia Commons"
+          }
+        },
+        "subtitle": "Two and a half centuries to build “the rich one of Toledo”",
+        "recap": "A Gothic cathedral begun in 1226 and closed in 1493",
+        "numbers": [
+          {
+            "value": "1226",
+            "label": "building begins"
+          },
+          {
+            "value": "1493",
+            "label": "the last vaults close"
+          },
+          {
+            "value": "3",
+            "label": "doors on the main front"
+          }
+        ],
+        "story": [
+          {
+            "lead": "A long build.",
+            "text": "Work began in 1226 under Ferdinand III. The last Gothic vaults were closed in 1493, under the Catholic Monarchs."
+          },
+          {
+            "lead": "Three doors.",
+            "text": "From left to right, the main front has the bell tower, the Door of Hell, the Door of Forgiveness, the Door of the Last Judgement, and an unfinished “second tower” used as a chapel."
+          },
+          {
+            "lead": "The Door of Forgiveness.",
+            "text": "Begun in 1418, it is named after the pardons granted to penitents. Today it opens only on great occasions, such as a new archbishop taking office."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "1226",
+            "text": "Ferdinand III starts the cathedral"
+          },
+          {
+            "year": "1418",
+            "text": "Work starts on the Door of Forgiveness"
+          },
+          {
+            "year": "1493",
+            "text": "The last Gothic vaults are closed"
+          }
+        ],
+        "context": {
+          "title": "Why so long?",
+          "text": "Medieval cathedrals took generations: money ran out, architects died, styles changed. Many, like this one, were never quite finished. Look at the stump of the second tower."
+        },
+        "lookCloser": [
+          {
+            "title": "White stone.",
+            "text": "The cathedral is built of white stone from Olihuelas, near Olías del Rey."
+          },
+          {
+            "title": "Figures.",
+            "text": "Find the carved saints and angels around the central door."
+          }
+        ],
+        "words": [
+          {
+            "word": "catedral",
+            "meaning": "cathedral"
+          },
+          {
+            "word": "perdón",
+            "meaning": "forgiveness"
+          },
+          {
+            "word": "infierno",
+            "meaning": "hell"
+          }
+        ],
+        "think": "Would you start a building you knew you would never see finished?",
+        "check": {
+          "question": "What is the cathedral’s nickname?",
+          "options": [
+            "The rich one of Toledo",
+            "The little one",
+            "The lost one"
+          ],
+          "answer": "The rich one of Toledo"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Catedral de Santa María de Toledo",
+            "url": "https://es.wikipedia.org/wiki/Catedral_de_Santa_Mar%C3%ADa_de_Toledo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "santo-tome",
+      "place": {
+        "name": "Iglesia de Santo Tomé",
+        "lat": 39.85682,
+        "lng": -4.02813,
+        "radiusM": 40
+      },
+      "riddle": "A minaret changed religion but kept its brickwork. Below it hangs the city’s most famous painting.",
+      "whereHint": "Plaza del Conde, in the old Jewish quarter, west of the cathedral.",
+      "look": "Look closely at the bell tower’s brickwork",
+      "question": "What is set into the tower’s brickwork as decoration?",
+      "options": [
+        "Glazed ceramic pieces",
+        "Gold leaf",
+        "Seashells",
+        "Painted saints"
+      ],
+      "answer": "Glazed ceramic pieces",
+      "hint": "Look for small shiny, coloured pieces.",
+      "lesson": {
+        "title": "Santo Tomé",
+        "image": {
+          "src": "images/santo-tome.jpg",
+          "alt": "The Mudéjar bell tower of Santo Tomé against the sky",
+          "credit": {
+            "artist": "José Luis Filpo Cabana",
+            "license": "CC BY 3.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+            "page": "https://commons.wikimedia.org/wiki/File:Iglesia_de_Santo_Tom%C3%A9_%28Toledo%29._Torre.jpg",
+            "site": "Wikimedia Commons"
+          },
+          "position": "50% 30%"
+        },
+        "subtitle": "A minaret turned bell tower, and El Greco’s masterpiece",
+        "recap": "A Mudéjar tower and The Burial of the Count of Orgaz",
+        "numbers": [
+          {
+            "value": "1300s",
+            "label": "the tower is rebuilt"
+          },
+          {
+            "value": "1323",
+            "label": "the lord of Orgaz dies"
+          },
+          {
+            "value": "2",
+            "label": "saints in the legend"
+          }
+        ],
+        "story": [
+          {
+            "lead": "From mosque to church.",
+            "text": "The church is first mentioned in the 12th century, on the site of an 11th-century mosque."
+          },
+          {
+            "lead": "A new tower.",
+            "text": "In the early 14th century, Gonzalo Ruiz de Toledo, lord of Orgaz, rebuilt the church and turned the minaret into a Mudéjar bell tower of stone and brick, with glazed ceramic set into it."
+          },
+          {
+            "lead": "A miracle on canvas.",
+            "text": "Legend says that when the lord of Orgaz was buried in 1323, Saint Stephen and Saint Augustine came down to lay him in his tomb. El Greco painted the scene, and the painting still hangs here."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "1100s",
+            "text": "The church is first mentioned"
+          },
+          {
+            "year": "1323",
+            "text": "The lord of Orgaz dies"
+          },
+          {
+            "year": "1586",
+            "text": "El Greco paints The Burial of the Count of Orgaz"
+          }
+        ],
+        "context": {
+          "title": "El Greco, the Greek of Toledo",
+          "text": "Doménikos Theotokópoulos was born in Crete and settled in Toledo, where he spent the rest of his life. People simply called him “the Greek”."
+        },
+        "lookCloser": [
+          {
+            "title": "Arches in the tower.",
+            "text": "Count the small arched windows on the tower."
+          },
+          {
+            "title": "The queue.",
+            "text": "The line by the back of the church is for the painting."
+          }
+        ],
+        "words": [
+          {
+            "word": "torre",
+            "meaning": "tower"
+          },
+          {
+            "word": "cuadro",
+            "meaning": "painting"
+          },
+          {
+            "word": "entierro",
+            "meaning": "burial"
+          }
+        ],
+        "think": "Why might a new religion reuse an old building instead of knocking it down?",
+        "check": {
+          "question": "Who painted The Burial of the Count of Orgaz?",
+          "options": [
+            "El Greco",
+            "Picasso",
+            "Goya"
+          ],
+          "answer": "El Greco"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Iglesia de Santo Tomé (Toledo)",
+            "url": "https://es.wikipedia.org/wiki/Iglesia_de_Santo_Tom%C3%A9_(Toledo)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "san-juan-de-los-reyes",
+      "place": {
+        "name": "Monasterio de San Juan de los Reyes",
+        "lat": 39.85769,
+        "lng": -4.03158,
+        "radiusM": 45
+      },
+      "riddle": "A queen’s monastery wears the reminders of prisoners set free.",
+      "whereHint": "Calle Reyes Católicos, at the western end of the Jewish quarter.",
+      "look": "Look up at the outer walls",
+      "question": "What hangs on the monastery’s outer walls?",
+      "options": [
+        "Swords",
+        "Iron chains",
+        "Bells",
+        "Horseshoes"
+      ],
+      "answer": "Iron chains",
+      "hint": "They once held prisoners.",
+      "lesson": {
+        "title": "San Juan de los Reyes",
+        "image": {
+          "src": "images/san-juan-de-los-reyes.jpg",
+          "alt": "The Gothic church of San Juan de los Reyes, with its pinnacles",
+          "credit": {
+            "artist": "Querubin Saldaña Sanchez",
+            "license": "CC BY-SA 3.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+            "page": "https://commons.wikimedia.org/wiki/File:Iglesia_del_monasterio_de_San_Juan_de_los_Reyes%2C_Toledo%2C_Espa%C3%B1a.jpg",
+            "site": "Wikimedia Commons"
+          }
+        },
+        "subtitle": "A queen’s victory monument, hung with chains",
+        "recap": "Isabella’s monastery, hung with the chains of freed captives",
+        "numbers": [
+          {
+            "value": "1476",
+            "label": "the battle of Toro"
+          },
+          {
+            "value": "1495",
+            "label": "the church is finished"
+          },
+          {
+            "value": "1853",
+            "label": "the architect’s name is found"
+          }
+        ],
+        "story": [
+          {
+            "lead": "A queen’s promise.",
+            "text": "Isabella I ordered this monastery to celebrate the victory of Toro (1476) and the birth of her son Juan (1478). It was meant to be a royal tomb."
+          },
+          {
+            "lead": "The chains.",
+            "text": "The chains on the walls belonged to Christian captives freed when Ferdinand reconquered Málaga and Baeza."
+          },
+          {
+            "lead": "A forgotten architect.",
+            "text": "It was designed by Juan Guas, but his name was only discovered in 1853, on an inscription in another Toledo church."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "1476",
+            "text": "Isabella’s side wins the battle of Toro"
+          },
+          {
+            "year": "1478",
+            "text": "Prince Juan is born"
+          },
+          {
+            "year": "1495",
+            "text": "The church is finished"
+          },
+          {
+            "year": "1853",
+            "text": "Juan Guas is identified as the architect"
+          }
+        ],
+        "context": {
+          "title": "The Catholic Monarchs",
+          "text": "Isabella of Castile and Ferdinand of Aragon married and ruled together. Their motto “tanto monta” (they are equal) and their emblem of a yoke and arrows appear all over this building."
+        },
+        "lookCloser": [
+          {
+            "title": "Count the chains.",
+            "text": "How many can you see from the street?"
+          },
+          {
+            "title": "Yoke and arrows.",
+            "text": "Look for the royal emblem in the stone."
+          }
+        ],
+        "words": [
+          {
+            "word": "cadena",
+            "meaning": "chain"
+          },
+          {
+            "word": "reina",
+            "meaning": "queen"
+          },
+          {
+            "word": "monasterio",
+            "meaning": "monastery"
+          }
+        ],
+        "think": "Why would someone hang chains on a church wall as a decoration?",
+        "check": {
+          "question": "Which queen ordered this monastery?",
+          "options": [
+            "Isabella I",
+            "Victoria",
+            "Elizabeth I"
+          ],
+          "answer": "Isabella I"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Monasterio de San Juan de los Reyes",
+            "url": "https://es.wikipedia.org/wiki/Monasterio_de_San_Juan_de_los_Reyes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "san-martin",
+      "place": {
+        "name": "Puente de San Martín",
+        "lat": 39.8566,
+        "lng": -4.03423,
+        "radiusM": 50
+      },
+      "riddle": "Go down to the river and find the bridge with a tower at each end.",
+      "whereHint": "Down the hill west of San Juan de los Reyes, over the Tagus.",
+      "look": "Find the coat of arms on the inner wall of the entrance tower",
+      "question": "How many seated kings flank the coat of arms?",
+      "options": [
+        "One",
+        "Two",
+        "Three",
+        "Four"
+      ],
+      "answer": "Two",
+      "hint": "One on each side.",
+      "lesson": {
+        "title": "Puente de San Martín",
+        "image": {
+          "src": "images/san-martin.jpg",
+          "alt": "The Puente de San Martín over the Tagus, with its towers",
+          "credit": {
+            "artist": "King of Hearts",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+            "page": "https://commons.wikimedia.org/wiki/File:Puente_de_San_Mart%C3%ADn_Toledo_June_2016.jpg",
+            "site": "Wikimedia Commons"
+          }
+        },
+        "subtitle": "A medieval bridge, burned, broken and rebuilt",
+        "recap": "A 14th-century bridge with a tower at each end",
+        "numbers": [
+          {
+            "value": "1390",
+            "label": "rebuilt by an archbishop"
+          },
+          {
+            "value": "2",
+            "label": "battlemented towers"
+          },
+          {
+            "value": "1921",
+            "label": "declared a national monument"
+          }
+        ],
+        "story": [
+          {
+            "lead": "Fire on the bridge.",
+            "text": "Around 1355, King Peter I of Castile reportedly set fire to the bridge’s gates, and it was damaged again in 1368."
+          },
+          {
+            "lead": "An archbishop rebuilds.",
+            "text": "Around 1390 Archbishop Pedro Tenorio rebuilt it with the great central arch and a battlemented tower at each end."
+          },
+          {
+            "lead": "Kings in stone.",
+            "text": "An inscription with the imperial shield between two seated kings remembers a later widening and paving."
+          }
+        ],
+        "timeline": [
+          {
+            "year": "1355",
+            "text": "The bridge’s gates are set on fire"
+          },
+          {
+            "year": "1390",
+            "text": "Archbishop Tenorio rebuilds it"
+          },
+          {
+            "year": "1921",
+            "text": "Declared a national monument"
+          }
+        ],
+        "context": {
+          "title": "A city in a river bend",
+          "text": "The Tagus wraps around three sides of Toledo, so bridges were the city’s doors. Whoever held them controlled who and what came in."
+        },
+        "lookCloser": [
+          {
+            "title": "The big arch.",
+            "text": "Look at the central arch from the riverbank: it’s the widest."
+          },
+          {
+            "title": "The view back.",
+            "text": "Turn around and look up at the city you just walked down."
+          }
+        ],
+        "words": [
+          {
+            "word": "puente",
+            "meaning": "bridge"
+          },
+          {
+            "word": "río",
+            "meaning": "river"
+          },
+          {
+            "word": "arco",
+            "meaning": "arch"
+          }
+        ],
+        "think": "Why did old bridges have towers and gates?",
+        "check": {
+          "question": "Which river flows under the bridge?",
+          "options": [
+            "The Tagus",
+            "The Ebro",
+            "The Thames"
+          ],
+          "answer": "The Tagus"
+        },
+        "sources": [
+          {
+            "name": "Wikipedia (Spanish): Puente de San Martín (Toledo)",
+            "url": "https://es.wikipedia.org/wiki/Puente_de_San_Mart%C3%ADn_(Toledo)"
+          }
+        ]
+      }
+    }
+  ]
+}
