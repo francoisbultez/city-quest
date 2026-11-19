@@ -8,10 +8,9 @@ export function buzz(pattern: number | number[]) {
   }
 }
 
-const COLORS = ['#AA151B', '#F1BF00', '#ff4a2b', '#F1BF00', '#AA151B']
-
-/** Lightweight confetti burst on a full-screen canvas, in the badge's flag colours. */
-export function confetti(origin: { x: number; y: number } = { x: 0.5, y: 0.4 }) {
+/** Lightweight confetti burst on a full-screen canvas, in the route's badge colours. */
+export function confetti(origin: { x: number; y: number } = { x: 0.5, y: 0.4 }, colors: readonly string[] = ['#ff4a2b', '#111113']) {
+  const COLORS = [...colors, '#ff4a2b']
   if (reducedMotion()) return
   const canvas = document.createElement('canvas')
   canvas.className = 'confetti'

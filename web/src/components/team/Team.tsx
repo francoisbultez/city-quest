@@ -4,7 +4,7 @@ import { awardBadge, type EarnedBadge } from '../../lib/session'
 import { listNames, orderedResults, teamPoints } from '../../lib/team/logic'
 import type { Room } from '../../lib/team/types'
 import { useTeam } from '../../lib/team/useTeam'
-import { routeById } from '../../content/routes'
+import { findRoute, routeById } from '../../engine/registry'
 import { Lesson } from '../Lesson'
 import { Modal } from '../Modal'
 import type { Mate } from '../RouteMap'
@@ -43,6 +43,14 @@ export function Team({ room, onExit, onBadges }: Props) {
   }
 
   if (game === undefined) return <main className="team-loading"><p>Connecting to your team…</p></main>
+  if (!findRoute(game?.routeId ?? '') && game) {
+    return (
+      <main className="team-loading">
+        <p>This team plays a route that isn’t on this phone.</p>
+        <button className="btn primary" onClick={() => onExit(true)}>Back to start</button>
+      </main>
+    )
+  }
   if (game === null || !game.players?.[me]) {
     return (
       <main className="team-loading">
@@ -75,6 +83,8 @@ export function Team({ room, onExit, onBadges }: Props) {
     const waitingFor = present.filter((id) => !game.ready?.[id]).map((id) => game.players[id].name)
     screen = (
       <Lesson
+        lang={route.language}
+        localLanguage={route.localLanguage}
         key={stop.id}
         stop={stop}
         index={game.index}
@@ -92,6 +102,8 @@ export function Team({ room, onExit, onBadges }: Props) {
     const rs = route.stops[review]
     screen = (
       <Lesson
+        lang={route.language}
+        localLanguage={route.localLanguage}
         key={rs.id}
         stop={rs}
         index={review}

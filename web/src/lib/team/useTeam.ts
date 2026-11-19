@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { distanceM } from '../route'
 import type { Position } from '../useGeolocation'
-import { routeById } from '../../content/routes'
+import { routeById } from '../../engine/registry'
 import { advancePatch, allReady, leaderId, presentIds, resolveAgreement, voteState } from './logic'
 import type { Patch, Room, TeamGame } from './types'
 

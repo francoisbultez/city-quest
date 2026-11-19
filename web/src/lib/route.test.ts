@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { solRoute } from '../content/madrid-sol'
+import { routeById } from '../engine/registry'
+
+const solRoute = routeById('madrid-sol')
 import { distanceM, heatFor, isAtStop, routeKm } from './route'
 
 const stops = solRoute.stops

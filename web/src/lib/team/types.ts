@@ -16,6 +16,8 @@ export interface TeamStopResult {
 export interface TeamGame {
   code: string
   routeId: string
+  /** For routes added by link: where teammates can download it. */
+  routeUrl?: string
   hostId: string
   createdAt: number
   status: 'lobby' | 'playing'

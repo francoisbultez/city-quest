@@ -81,7 +81,7 @@ export function TeamQuiz({ game, stop, total, points, me, present, onVote, onHin
       </div>
       <Progress total={total} done={game.index} current={game.index} />
 
-      <span className="look">{stop.look}</span>
+      {stop.look && <span className="look">{stop.look}</span>}
       <h2>{stop.question}</h2>
 
       <div className="options">
@@ -115,9 +115,11 @@ export function TeamQuiz({ game, stop, total, points, me, present, onVote, onHin
       <button className={lock.action ? 'btn primary lock' : 'btn lock waiting'} onClick={lock.action} disabled={!lock.action}>{lock.label}</button>
 
       <div className="quiz-foot">
+        {stop.hint ? (
         <button className="link" onClick={onHint} disabled={game.hinted}>
           {game.hinted ? 'Hint used' : <>Hint <span>−{HINT_COST}</span></>}
         </button>
+        ) : <span />}
         <span className="points"><span className="star" aria-hidden="true">★</span> {points}</span>
       </div>
     </main>

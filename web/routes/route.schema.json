@@ -1,0 +1,522 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "formatVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "language": {
+      "default": "en",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 20
+    },
+    "city": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "country": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "badgeLine": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 22
+    },
+    "tagline": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "start": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "duration": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "colors": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "ink": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        }
+      },
+      "required": [
+        "colors"
+      ]
+    },
+    "localLanguage": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 20
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        }
+      },
+      "required": [
+        "code",
+        "name"
+      ]
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "stops": {
+      "minItems": 2,
+      "maxItems": 30,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "place": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lng": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radiusM": {
+                "type": "integer",
+                "minimum": 20,
+                "maximum": 200
+              }
+            },
+            "required": [
+              "name",
+              "lat",
+              "lng",
+              "radiusM"
+            ]
+          },
+          "riddle": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "whereHint": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "look": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "options": {
+            "minItems": 2,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          },
+          "answer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "hint": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "lesson": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "src": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  "alt": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 300
+                  },
+                  "position": {
+                    "type": "string"
+                  },
+                  "credit": {
+                    "type": "object",
+                    "properties": {
+                      "artist": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      "license": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      "licenseUrl": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "page": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "site": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 60
+                      }
+                    },
+                    "required": [
+                      "artist",
+                      "license",
+                      "page"
+                    ]
+                  }
+                },
+                "required": [
+                  "src",
+                  "alt",
+                  "credit"
+                ]
+              },
+              "subtitle": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "recap": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "numbers": {
+                "maxItems": 3,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "label"
+                  ]
+                }
+              },
+              "story": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "lead": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  },
+                  "required": [
+                    "lead",
+                    "text"
+                  ]
+                }
+              },
+              "timeline": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "year": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    }
+                  },
+                  "required": [
+                    "year",
+                    "text"
+                  ]
+                }
+              },
+              "context": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "title",
+                  "text"
+                ]
+              },
+              "lookCloser": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "text"
+                  ]
+                }
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "word": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "meaning": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120
+                    }
+                  },
+                  "required": [
+                    "word",
+                    "meaning"
+                  ]
+                }
+              },
+              "think": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "check": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 300
+                  },
+                  "options": {
+                    "minItems": 2,
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120
+                    }
+                  },
+                  "answer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                },
+                "required": [
+                  "question",
+                  "options",
+                  "answer"
+                ]
+              },
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "url"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "title"
+            ]
+          },
+          "verification": {
+            "default": {
+              "status": "draft"
+            },
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "verified"
+                ]
+              },
+              "date": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "place",
+          "riddle",
+          "question",
+          "options",
+          "answer",
+          "lesson"
+        ]
+      }
+    }
+  },
+  "required": [
+    "formatVersion",
+    "id",
+    "city",
+    "name",
+    "badgeLine",
+    "tagline",
+    "start",
+    "duration",
+    "stops"
+  ],
+  "title": "City Quest route",
+  "description": "One treasure-hunt route. See docs/creating-a-route.md."
+}

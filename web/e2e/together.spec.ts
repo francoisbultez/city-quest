@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
-import { solRoute } from '../src/content/madrid-sol'
+import { routeFile } from './routes'
+
+const solRoute = routeFile('madrid-sol')
 import type { Stop } from '../src/types'
 
 const stops = solRoute.stops

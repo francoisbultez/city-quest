@@ -1,23 +1,20 @@
-/** Route badge: Spanish flag roundel. Solo badges are round, team badges are rounded squares. */
-export function Badge({
-  size = 200,
-  mode = 'solo',
-  line,
-  city = 'MADRID',
-  locked = false,
-}: {
-  size?: number
-  mode?: 'solo' | 'team'
-  line: string
-  city?: string
-  locked?: boolean
-}) {
-  const clipId = `badge-clip-${mode}-${size}`
+import type { Route } from '../types'
+
+const DEFAULT_THEME = { colors: ['#ff4a2b', '#ffffff'] as const, ink: '#ff4a2b' }
+
+/** A route's badge, in the route's colours. Solo badges are round, team badges are rounded squares. */
+export function Badge({ size = 200, mode = 'solo', route, locked = false }: { size?: number; mode?: 'solo' | 'team'; route: Route; locked?: boolean }) {
+  const [outer, band] = route.theme?.colors ?? DEFAULT_THEME.colors
+  const ink = route.theme?.ink ?? (route.theme ? route.theme.colors[0] : DEFAULT_THEME.ink)
+  const city = route.city.toUpperCase()
+  // Long city names shrink to fit the band.
+  const citySize = Math.min(34, Math.floor(300 / Math.max(city.length, 1)))
+  const clipId = `badge-clip-${mode}-${size}-${route.id}`
   return (
     <svg
       className={locked ? 'badge locked' : 'badge'}
       role="img"
-      aria-label={`${mode === 'team' ? 'Team' : 'Solo'} badge: ${city}, ${line}${locked ? ', not earned yet' : ''}`}
+      aria-label={`${mode === 'team' ? 'Team' : 'Solo'} badge: ${city}, ${route.badgeLine}${locked ? ', not earned yet' : ''}`}
       width={size}
       height={size}
       viewBox="0 0 200 200"
@@ -28,17 +25,17 @@ export function Badge({
         </clipPath>
       </defs>
       <g clipPath={`url(#${clipId})`}>
-        <rect width="200" height="200" fill="#AA151B" />
-        <rect y="52" width="200" height="96" fill="#F1BF00" />
+        <rect width="200" height="200" fill={outer} />
+        <rect y="52" width="200" height="96" fill={band} />
       </g>
-      <text x="100" y="106" textAnchor="middle" fill="#AA151B" fontSize="34" fontWeight="800" letterSpacing="0.5">
+      <text x="100" y={96 + citySize / 3} textAnchor="middle" fill={ink} fontSize={citySize} fontWeight="800" letterSpacing="0.5">
         {city}
       </text>
-      <text x="100" y="128" textAnchor="middle" fill="#7a1015" fontSize="11" fontWeight="700" letterSpacing="2.4">
-        {line}
+      <text x="100" y="128" textAnchor="middle" fill={ink} fillOpacity="0.8" fontSize="11" fontWeight="700" letterSpacing="2.4">
+        {route.badgeLine}
       </text>
       <rect x="68" y="160" width="64" height="22" rx="11" fill="#ffffff" />
-      <text x="100" y="175" textAnchor="middle" fill="#AA151B" fontSize="11" fontWeight="800" letterSpacing="1.6">
+      <text x="100" y="175" textAnchor="middle" fill={outer === '#ffffff' ? ink : outer} fontSize="11" fontWeight="800" letterSpacing="1.6">
         {mode === 'team' ? 'TEAM' : 'SOLO'}
       </text>
     </svg>

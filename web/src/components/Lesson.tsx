@@ -26,12 +26,16 @@ interface Props {
   actionLabel: string
   onAction: () => void
   onBack?: () => void
+  /** The route's language, for the read-aloud voice. */
+  lang?: string
+  /** The local language, for the words section, e.g. { code: "es", name: "Spanish" }. */
+  localLanguage?: { code: string; name: string }
 }
 
-export function Lesson({ stop, index, total, result, picked, spotted, onCheck, onSpot, actionLabel, onAction, onBack }: Props) {
+export function Lesson({ stop, index, total, result, picked, spotted, onCheck, onSpot, actionLabel, onAction, onBack, lang = 'en', localLanguage }: Props) {
   const l = stop.lesson
   const answered = picked !== undefined
-  const right = picked === l.check.answer
+  const right = picked === l.check?.answer
 
   // A new lesson starts at the top.
   useEffect(() => {
@@ -50,6 +54,7 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
     }
     setPlaying(true)
     stopRef.current = speak(lessonScript(stop), {
+      lang,
       onEnd: () => {
         setPlaying(false)
         stopRef.current = null
@@ -89,38 +94,40 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
           )}
         </div>
         <h1>{l.title}</h1>
-        <p>{l.subtitle}</p>
+        {l.subtitle && <p>{l.subtitle}</p>}
       </header>
 
       {l.image && (
         <figure className="lesson-photo">
-          <img src={`${import.meta.env.BASE_URL}${l.image.src}`} alt={l.image.alt} loading="eager" decoding="async" style={{ objectPosition: l.image.position ?? '50% 50%' }} />
+          <img src={l.image.src} alt={l.image.alt} loading="eager" decoding="async" style={{ objectPosition: l.image.position ?? '50% 50%' }} />
           <figcaption>
             Photo: {l.image.credit.artist} ·{' '}
             {l.image.credit.licenseUrl ? <a href={l.image.credit.licenseUrl} target="_blank" rel="noreferrer">{l.image.credit.license}</a> : l.image.credit.license}
             {' · '}
-            <a href={l.image.credit.page} target="_blank" rel="noreferrer">Wikimedia Commons</a>
+            <a href={l.image.credit.page} target="_blank" rel="noreferrer">{l.image.credit.site ?? 'Source'}</a>
           </figcaption>
         </figure>
       )}
 
-      <div className="numbers">
+      {l.numbers && l.numbers.length > 0 && <div className="numbers">
         {l.numbers.map((n, i) => (
           <div key={n.label}>
             <b className={i === 0 ? 'accent' : ''}>{n.value}</b>
             <span>{n.label}</span>
           </div>
         ))}
-      </div>
+      </div>}
 
-      <section className="story">
-        <h2>The story</h2>
-        {l.story.map((p) => (
-          <p key={p.lead}><b>{p.lead}</b> {p.text}</p>
-        ))}
-      </section>
+      {l.story && l.story.length > 0 && (
+        <section className="story">
+          <h2>The story</h2>
+          {l.story.map((p) => (
+            <p key={p.lead}><b>{p.lead}</b> {p.text}</p>
+          ))}
+        </section>
+      )}
 
-      {l.timeline.length > 0 && (
+      {l.timeline && l.timeline.length > 0 && (
         <section>
           <h2>Timeline</h2>
           <ol className="timeline">
@@ -134,13 +141,15 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
         </section>
       )}
 
-      <section className="context">
-        <span className="label">In context</span>
-        <h3>{l.context.title}</h3>
-        <p>{l.context.text}</p>
-      </section>
+      {l.context && (
+        <section className="context">
+          <span className="label">In context</span>
+          <h3>{l.context.title}</h3>
+          <p>{l.context.text}</p>
+        </section>
+      )}
 
-      <section>
+      {l.lookCloser && l.lookCloser.length > 0 && <section>
         <h2>Look closer</h2>
         <p className="section-sub">You’re standing here. Tick what you spot.</p>
         <div className="spots">
@@ -154,26 +163,30 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
             )
           })}
         </div>
-      </section>
+      </section>}
 
-      <section>
-        <h2>Spanish words</h2>
-        <dl className="words">
-          {l.words.map((w) => (
-            <div key={w.es}>
-              <dt lang="es">{w.es}</dt>
-              <dd>{w.en}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {l.words && l.words.length > 0 && (
+        <section>
+          <h2>{localLanguage ? `${localLanguage.name} words` : 'Local words'}</h2>
+          <dl className="words">
+            {l.words.map((w) => (
+              <div key={w.word}>
+                <dt lang={localLanguage?.code}>{w.word}</dt>
+                <dd>{w.meaning}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
-      <section className="think">
-        <span className="label">Think about it</span>
-        <p>{l.think}</p>
-      </section>
+      {l.think && (
+        <section className="think">
+          <span className="label">Think about it</span>
+          <p>{l.think}</p>
+        </section>
+      )}
 
-      <section>
+      {l.check && <section>
         <div className="check-head">
           <h2>Quick check</h2>
           <span className={answered ? (right ? 'bonus won' : 'bonus') : 'bonus'}>{answered ? (right ? `+${CHECK_BONUS} earned` : 'No bonus') : `+${CHECK_BONUS}`}</span>
@@ -181,7 +194,7 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
         <p className="check-q">{l.check.question}</p>
         <div className={l.check.options.some((o) => o.length > 12) ? 'check-options stacked' : 'check-options'}>
           {l.check.options.map((o) => {
-            const state = !answered ? '' : o === l.check.answer ? ' right' : o === picked ? ' wrong' : ' dim'
+            const state = !answered ? '' : o === l.check!.answer ? ' right' : o === picked ? ' wrong' : ' dim'
             return (
               <button key={o} className={`check-option${state}`} disabled={answered} onClick={() => onCheck(o)}>
                 {o}
@@ -190,12 +203,12 @@ export function Lesson({ stop, index, total, result, picked, spotted, onCheck, o
           })}
         </div>
         {answered && <p className={right ? 'check-msg right' : 'check-msg'} role="status">{right ? 'Right! You were paying attention.' : `The answer is ${l.check.answer}.`}</p>}
-      </section>
+      </section>}
 
       <section className="sources">
-        <span>Sources</span>
+        {l.sources && l.sources.length > 0 && <span>Sources</span>}
         <p>
-          {l.sources.map((s, i) => (
+          {(l.sources ?? []).map((s, i) => (
             <span key={s.url}>
               {i > 0 && ' · '}
               <a href={s.url} target="_blank" rel="noreferrer">{s.name}</a>

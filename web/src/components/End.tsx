@@ -16,10 +16,11 @@ export function End({ route, session, points, onHome, onReview }: { route: Route
   const elapsed = (session.finishedAt ?? session.startedAt) - session.startedAt
   const [toast, setToast] = useState<string | null>(null)
 
+  const colors = route.theme?.colors
   useEffect(() => {
-    const t = setTimeout(() => confetti({ x: 0.5, y: 0.25 }), 250)
+    const t = setTimeout(() => confetti({ x: 0.5, y: 0.25 }, colors), 250)
     return () => clearTimeout(t)
-  }, [])
+  }, [colors])
 
   const share = async () => {
     const text = `I earned the ${route.city} · ${route.name} badge on City Quest: ${stars} of 3 stars, ${points} points.`
@@ -40,21 +41,21 @@ export function End({ route, session, points, onHome, onReview }: { route: Route
     <main className="end">
       <span className="unlocked">New badge unlocked</span>
       <div className="badge-hero">
-        <Badge size={200} line={route.badgeLine} />
+        <Badge size={200} route={route} />
       </div>
       <Stars count={stars} />
       <h1>{route.city} · {route.name}</h1>
       <p className="sub">Solo · {stars} of 3 stars · completed today</p>
 
       <div className="stats">
-        <div><span>Points</span><b className="accent" data-testid="final-score">{points}</b><small>of {maxPoints(total) + total * CHECK_BONUS} with bonuses</small></div>
+        <div><span>Points</span><b className="accent" data-testid="final-score">{points}</b><small>of {maxPoints(total) + route.stops.filter((st) => st.lesson.check).length * CHECK_BONUS} with bonuses</small></div>
         <div><span>First try</span><b>{firstTry}/{total}</b><small>best streak: {bestStreak(session.results)}</small></div>
         <div><span>Walked</span><b>{km.toFixed(1)}<i>{"\u00a0"}km</i></b><small>about {(Math.round((km * STEPS_PER_KM) / 100) * 100).toLocaleString('en')} steps</small></div>
         <div><span>Time</span><b>{formatDuration(elapsed)}</b><small>{total} places found</small></div>
       </div>
 
       <p className="learned">
-        {Object.entries(session.checks).filter(([id, o]) => route.stops.find((x) => x.id === id)?.lesson.check.answer === o).length} of {total} quick checks right · {session.spotted.length} details spotted
+        {Object.entries(session.checks).filter(([id, o]) => route.stops.find((x) => x.id === id)?.lesson.check?.answer === o).length} of {total} quick checks right · {session.spotted.length} details spotted
       </p>
 
       <section className="recap">
@@ -66,7 +67,7 @@ export function End({ route, session, points, onHome, onReview }: { route: Route
               <button onClick={() => onReview(i)}>
                 {st.lesson.image ? (
                   <span className="thumb">
-                    <img src={`${import.meta.env.BASE_URL}${st.lesson.image.src}`} alt="" loading="lazy" />
+                    <img src={st.lesson.image.src} alt="" loading="lazy" />
                     <i>{i + 1}</i>
                   </span>
                 ) : (

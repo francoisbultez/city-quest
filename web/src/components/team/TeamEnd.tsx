@@ -25,10 +25,11 @@ export function TeamEnd({ route, game, me, points, onReview, onHome }: Props) {
   const award = awardsFor(game, route.stops)[me]
   const [toast, setToast] = useState<string | null>(null)
 
+  const colors = route.theme?.colors
   useEffect(() => {
-    const t = setTimeout(() => confetti({ x: 0.5, y: 0.25 }), 250)
+    const t = setTimeout(() => confetti({ x: 0.5, y: 0.25 }, colors), 250)
     return () => clearTimeout(t)
-  }, [])
+  }, [colors])
 
   const share = async () => {
     const text = `Our team (${names}) earned the ${route.city} · ${route.name} badge on City Quest: ${stars} of 3 stars, ${points} points.`
@@ -49,7 +50,7 @@ export function TeamEnd({ route, game, me, points, onReview, onHome }: Props) {
     <main className="end team-end">
       <span className="unlocked">Team badge unlocked</span>
       <div className="badge-hero">
-        <Badge size={200} mode="team" line={route.badgeLine} />
+        <Badge size={200} mode="team" route={route} />
       </div>
       <Stars count={stars} />
       <h1>{route.city} · {route.name}</h1>
@@ -59,7 +60,7 @@ export function TeamEnd({ route, game, me, points, onReview, onHome }: Props) {
       </div>
 
       <div className="stats two">
-        <div><span>Team points</span><b className="accent" data-testid="final-score">{points}</b><small>of {maxPoints(total) + total * CHECK_BONUS} with bonuses</small></div>
+        <div><span>Team points</span><b className="accent" data-testid="final-score">{points}</b><small>of {maxPoints(total) + route.stops.filter((st) => st.lesson.check).length * CHECK_BONUS} with bonuses</small></div>
         <div><span>Agreed first time</span><b>{firstTime}/{total}</b><small>{total} places found</small></div>
       </div>
 
@@ -80,7 +81,7 @@ export function TeamEnd({ route, game, me, points, onReview, onHome }: Props) {
               <button onClick={() => onReview(i)}>
                 {st.lesson.image ? (
                   <span className="thumb">
-                    <img src={`${import.meta.env.BASE_URL}${st.lesson.image.src}`} alt="" loading="lazy" />
+                    <img src={st.lesson.image.src} alt="" loading="lazy" />
                     <i>{i + 1}</i>
                   </span>
                 ) : (

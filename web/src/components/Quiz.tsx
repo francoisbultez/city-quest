@@ -57,7 +57,7 @@ export function Quiz({ stop, index, total, points, hinted, onHint, onWrong, onCo
       </div>
       <Progress total={total} done={index} current={index} />
 
-      <span className="look">{stop.look}</span>
+      {stop.look && <span className="look">{stop.look}</span>}
       <h2>{stop.question}</h2>
 
       <div className="options">
@@ -76,9 +76,11 @@ export function Quiz({ stop, index, total, points, hinted, onHint, onWrong, onCo
       {hinted && <p className="hint-text"><b>Hint:</b> {stop.hint}</p>}
 
       <div className="quiz-foot">
+        {stop.hint ? (
         <button className="link" onClick={onHint} disabled={hinted}>
           {hinted ? 'Hint used' : <>Hint <span>−{HINT_COST}</span></>}
         </button>
+        ) : <span />}
         <span className="points"><span className="star" aria-hidden="true">★</span> {points}</span>
       </div>
     </main>

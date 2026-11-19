@@ -42,7 +42,7 @@ export function Home({ route, routes, onPickRoute, badges, session, onStart, onR
 
       <section className="route-card" key={route.id}>
         <span className="label">{earned ? 'Your badge' : 'Earn this badge'}</span>
-        <Badge size={150} mode={mode} line={route.badgeLine} locked={false} />
+        <Badge size={150} mode={mode} route={route} />
         {earned && <Stars count={earned.stars} size={24} />}
         <h1>{route.city} · {route.name}</h1>
         <p>{earned ? `Best score: ${earned.points} points. Go for ${earned.stars < 3 ? 'more stars' : 'a perfect run'}?` : route.tagline}</p>

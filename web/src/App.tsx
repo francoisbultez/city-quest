@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { End } from './components/End'
 import { Home } from './components/Home'
 import { Lesson } from './components/Lesson'
@@ -7,7 +7,7 @@ import { Quiz } from './components/Quiz'
 import { Walk } from './components/Walk'
 import { Team } from './components/team/Team'
 import { TeamJoin } from './components/team/TeamJoin'
-import { routeById, routes } from './content/routes'
+import { addRouteFromUrl, findRoute, getRoutes, RouteError, routeById, subscribeRoutes } from './engine/registry'
 import { currentStreak, isPerfect, starsFor, stopPoints } from './lib/game'
 import { awardBadge, loadBadges, loadSession, newSession, saveSession, sessionPoints, type Session } from './lib/session'
 import { load, reportClue, save } from './lib/storage'
@@ -17,7 +17,12 @@ import type { Room } from './lib/team/types'
 const REASONS = ['Can’t find it', 'Answer looks wrong', 'Covered or closed', 'Other']
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>(loadSession)
+  const routes = useSyncExternalStore(subscribeRoutes, getRoutes)
+  // A saved game whose route has since been removed can't be resumed.
+  const [session, setSession] = useState<Session | null>(() => {
+    const s = loadSession()
+    return s && findRoute(s.routeId) ? s : null
+  })
   // Route shown on the home screen; a solo game always plays its own route.
   const [pickedId, setPickedId] = useState(() => load<string | null>('cq.route', null) ?? session?.routeId ?? routes[0].id)
   const picked = routeById(pickedId)
@@ -48,15 +53,32 @@ export default function App() {
   }, [teamView, room, teamCode])
   useEffect(() => () => room?.close(), [room])
 
-  const answers = Object.fromEntries(route.stops.map((st) => [st.id, st.lesson.check.answer]))
+  const flash = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2500)
+  }
+
+  // `?route=<link to a route.json>` adds someone else's route to this phone.
+  useEffect(() => {
+    const link = new URLSearchParams(window.location.search).get('route')
+    if (!link) return
+    const params = new URLSearchParams(window.location.search)
+    params.delete('route')
+    window.history.replaceState(null, '', window.location.pathname + (params.size ? `?${params}` : ''))
+    addRouteFromUrl(link)
+      .then((r) => {
+        setPickedId(r.id)
+        save('cq.route', r.id)
+        flash(`Added “${r.city} · ${r.name}”`)
+      })
+      .catch((e) => flash(e instanceof RouteError ? [e.message, ...e.details.slice(0, 2)].join(' ') : 'Couldn’t add that route.'))
+  }, [])
+
+  const answers = Object.fromEntries(route.stops.flatMap((st) => (st.lesson.check ? [[st.id, st.lesson.check.answer]] : [])))
 
   const update = (s: Session | null) => {
     setSession(s)
     saveSession(s)
-  }
-  const flash = (msg: string) => {
-    setToast(msg)
-    setTimeout(() => setToast(null), 2500)
   }
 
   if (teamView === 'join') {
@@ -98,6 +120,7 @@ export default function App() {
 
   if (atHome || !session) {
     return (
+      <>
       <Home
         key={homeMode}
         initialMode={homeMode}
@@ -117,6 +140,8 @@ export default function App() {
         }}
         onResume={() => setAtHome(false)}
       />
+      {toast && <div className="toast" role="status">{toast}</div>}
+      </>
     )
   }
 
@@ -199,6 +224,8 @@ export default function App() {
     const last = s.results[s.results.length - 1]
     screen = (
       <Lesson
+        lang={route.language}
+        localLanguage={route.localLanguage}
         key={stop.id}
         stop={stop}
         index={s.index}
@@ -221,6 +248,8 @@ export default function App() {
     const rs = route.stops[review]
     screen = (
       <Lesson
+        lang={route.language}
+        localLanguage={route.localLanguage}
         key={rs.id}
         stop={rs}
         index={review}

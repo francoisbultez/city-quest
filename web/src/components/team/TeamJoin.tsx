@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { firstName, makeCode, MAX_PLAYERS, nextColor, normalizeCode, TEAM_COLORS } from '../../lib/team/logic'
+import { addRouteFromUrl, findRoute, sourceUrlOf } from '../../engine/registry'
 import { loadName, openRoom, roomExists } from '../../lib/team/room'
 import type { Room, TeamGame } from '../../lib/team/types'
 import type { Route } from '../../types'
@@ -36,6 +37,7 @@ export function TeamJoin({ route, initialCode = '', onJoined, onBack }: Props) {
       const game: TeamGame = {
         code: c,
         routeId: route.id,
+        ...(sourceUrlOf(route.id) ? { routeUrl: sourceUrlOf(route.id) } : {}),
         hostId: room.me,
         createdAt: t,
         status: 'lobby',
@@ -66,6 +68,15 @@ export function TeamJoin({ route, initialCode = '', onJoined, onBack }: Props) {
         })
       })
       if (!game) return fail(`No team with the code ${code}.`)
+      // The team plays a route this phone doesn't have yet: download it first.
+      if (!findRoute(game.routeId)) {
+        if (!game.routeUrl) return fail('This team plays a route that isn’t on this phone.')
+        try {
+          await addRouteFromUrl(game.routeUrl)
+        } catch {
+          return fail('Couldn’t download the route this team is playing.')
+        }
+      }
       const players = game.players ?? {}
       if (!players[room.me]) {
         if (Object.keys(players).length >= MAX_PLAYERS) return fail('This team is full (4 players).')

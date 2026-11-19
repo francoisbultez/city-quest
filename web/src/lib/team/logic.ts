@@ -80,7 +80,7 @@ export function orderedResults(g: TeamGame, stops: Stop[]) {
 
 export function teamPoints(g: TeamGame, stops: Stop[], checkBonus: number): number {
   const base = Object.values(g.results ?? {}).reduce((s, r) => s + r.points, 0)
-  const bonus = stops.filter((s) => g.checks?.[s.id] !== undefined && g.checks[s.id] === s.lesson.check.answer).length * checkBonus
+  const bonus = stops.filter((s) => g.checks?.[s.id] !== undefined && g.checks[s.id] === s.lesson.check?.answer).length * checkBonus
   return base + bonus
 }
 

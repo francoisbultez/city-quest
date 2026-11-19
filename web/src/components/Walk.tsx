@@ -95,7 +95,7 @@ export function Walk({ stops, index, points, onArrive, onPause, mates, onPositio
             </div>
             {note && <p className="team-note">{note}</p>}
             <div className="row-buttons">
-              <button className="btn soft" onClick={() => setShowWhere(true)} disabled={showWhere}>Where is it?</button>
+              {stop.whereHint && <button className="btn soft" onClick={() => setShowWhere(true)} disabled={showWhere}>Where is it?</button>}
               <button className="btn soft" onClick={onArrive}>I’m here</button>
             </div>
             {testMode && (
