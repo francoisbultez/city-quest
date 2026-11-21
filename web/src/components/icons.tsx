@@ -46,3 +46,12 @@ export const Stars = ({ n }: { n: number }) => (
     ))}
   </span>
 )
+export const IconEye = ({ size = 22 }: { size?: number }) => (
+  <svg {...base} width={size} height={size}><circle cx="12" cy="12" r="3" /><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /></svg>
+)
+export const IconCompass = ({ size = 24 }: { size?: number }) => (
+  <svg {...base} width={size} height={size}><circle cx="12" cy="12" r="9" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></svg>
+)
+export const IconUser = ({ size = 24 }: { size?: number }) => (
+  <svg {...base} width={size} height={size}><circle cx="12" cy="8" r="4" /><path d="M5 20c1-4 4-6 7-6s6 2 7 6" /></svg>
+)

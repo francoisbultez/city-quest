@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { builtInIds, openRoute, routeFile } from './routes'
+import { builtInIds, openRoute, routeFile, skipWelcome } from './routes'
 import type { Stop } from '../src/types'
+
+test.beforeEach(async ({ context }) => {
+  await skipWelcome(context)
+})
 
 const at = (s: Stop) => ({ latitude: s.place.lat, longitude: s.place.lng, accuracy: 10 })
 
@@ -85,7 +89,7 @@ test('add a route someone else made, from a link', async ({ page, context }) => 
   await page.goto(`/?route=${encodeURIComponent(LINK)}`)
   await expect(page.getByRole('status')).toHaveText('Added “Lisboa · The Tiny Tram Route”')
   await expect(page).toHaveURL(/\/$/)
-  await expect(page.getByRole('heading', { name: 'Explore Lisboa' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Treasure hunts through Lisboa' })).toBeVisible()
   await openRoute(page, tinyRoute)
   await expect(page.getByRole('img', { name: /LISBOA, TINY TRAM/ })).toBeVisible()
   await expect(page.getByText('Route by A player')).toBeVisible()
@@ -100,7 +104,8 @@ test('add a route someone else made, from a link', async ({ page, context }) => 
 
   // Still there after a reload, without the link.
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Explore Lisboa' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Change city, now Lisboa' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Continue.*The Tiny Tram Route/ })).toBeVisible()
 })
 
 test('a broken route file is refused with the reason', async ({ page, context }) => {

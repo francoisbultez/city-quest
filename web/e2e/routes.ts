@@ -23,3 +23,13 @@ export async function openRoute(page: import('@playwright/test').Page, route: { 
   await page.getByRole('button', { name: new RegExp(`^${route.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:`) }).click()
   await page.getByRole('heading', { level: 1, name: route.name }).waitFor()
 }
+
+/** Skips the one-time welcome screen in tests about other things. */
+export const skipWelcome = (context: import('@playwright/test').BrowserContext) =>
+  context.addInitScript(() => {
+    try {
+      localStorage.setItem('cq.welcomed', 'true')
+    } catch {
+      /* storage blocked */
+    }
+  })

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { badgesIn, inSentence, type City, routeStatus } from '../../lib/cities'
+import { badgesIn, type City, routeStatus } from '../../lib/cities'
+import { avatarColor } from '../../lib/profile'
 import type { EarnedBadge, Session } from '../../lib/session'
 import type { Route } from '../../types'
-import { IconChevron, IconMedal, IconPin, IconUsers } from '../icons'
+import { IconChevron, IconPin, IconUser, IconUsers } from '../icons'
 import { Cover } from './Cover'
 import { RouteCard } from './RouteCard'
+import { Steps } from './Steps'
 
 interface Props {
   city: City
@@ -15,56 +17,63 @@ interface Props {
   /** Route to show first in the carousel. */
   focusId?: string
   team: string | null
+  name: string
   onCities: () => void
   onSeeAll: () => void
   onOpen: (route: Route) => void
   onResume: () => void
   onTeam: () => void
-  onJoinTeam: () => void
+  onYou: () => void
 }
 
-export function Home({ city, badges, session, playingRoute, focusId, team, onCities, onSeeAll, onOpen, onResume, onTeam, onJoinTeam }: Props) {
-  const rail = useRef<HTMLDivElement>(null)
-  const start = Math.max(0, city.routes.findIndex((r) => r.id === focusId))
-  const [active, setActive] = useState(start)
+export function Home({ city, badges, session, playingRoute, focusId, team, name, onCities, onSeeAll, onOpen, onResume, onTeam, onYou }: Props) {
   const n = city.routes.length
-  const current = city.routes[Math.min(active, n - 1)]
   const playing = session && session.screen !== 'end' && playingRoute ? session : null
   const earned = badgesIn(city, badges)
-
-  // Open on the route played or picked last.
-  useEffect(() => {
-    const el = rail.current?.children[start] as HTMLElement | undefined
-    if (el && rail.current) rail.current.scrollLeft = el.offsetLeft - rail.current.offsetLeft - 20
-  }, [start, city.key])
-
-  const onScroll = () => {
-    const el = rail.current
-    if (!el || !el.children.length) return
-    const w = (el.children[0] as HTMLElement).offsetWidth + 14
-    setActive(Math.max(0, Math.min(n - 1, Math.round(el.scrollLeft / w))))
-  }
+  // Someone who has played before sees their progress first; a newcomer sees what the app is.
+  const returning = badges.length > 0 || !!playing || !!team
 
   return (
-    <main className="home browse enter">
+    <main className="home browse with-tabs enter">
       <header className="home-head">
         <button className="city-btn" onClick={onCities} aria-label={`Change city, now ${city.name}`}>
           <span className="pin"><IconPin size={17} /></span>
           {city.name}
           <IconChevron dir="down" size={15} />
         </button>
-        <span className="count-pill" aria-label={`${badges.length} ${badges.length === 1 ? 'badge' : 'badges'}`}>
-          <IconMedal /> {badges.length}
-        </span>
+        {name ? (
+          <button className="avatar-btn" style={{ background: avatarColor(name) }} onClick={onYou} aria-label={`You: ${name}`}>
+            {name.slice(0, 1).toUpperCase()}
+          </button>
+        ) : (
+          <button className="avatar-btn empty" onClick={onYou} aria-label="You">
+            <IconUser size={20} />
+          </button>
+        )}
       </header>
 
-      <div className="hello">
-        <h1>Explore {city.name}</h1>
-        <p>
-          {n} {n === 1 ? 'treasure hunt' : 'treasure hunts'}
-          {earned > 0 ? ` · ${earned} of ${n} badges earned` : ' on foot, with a badge to earn'}
-        </p>
-      </div>
+      {returning ? (
+        <div className="hello">
+          <h1>{name ? `Hola, ${name}` : 'Welcome back'}</h1>
+          <p>
+            {earned === n
+              ? `${city.name} complete: you earned every badge here.`
+              : earned > 0
+                ? `${earned} of ${n} ${city.name} badges. ${n - earned === 1 ? 'One more' : `${n - earned} more`} to complete the city.`
+                : `${n} ${n === 1 ? 'hunt' : 'hunts'} to play in ${city.name}.`}
+          </p>
+          <div className="city-progress" aria-hidden="true">
+            <span className="bar"><i style={{ width: `${(100 * earned) / n}%` }} /></span>
+            <b>{earned}/{n}</b>
+          </div>
+        </div>
+      ) : (
+        <div className="hello">
+          <h1>Treasure hunts through {city.name}</h1>
+          <p>Follow riddles across the city, answer what you see, earn the badge.</p>
+          <Steps compact />
+        </div>
+      )}
 
       {playing && playingRoute && (
         <button className="resume-card" onClick={onResume}>
@@ -90,14 +99,48 @@ export function Home({ city, badges, session, playingRoute, focusId, team, onCit
       )}
 
       <div className="rail-head">
-        <h2>{n === 1 ? 'The route' : 'Routes'}</h2>
+        <h2>{returning ? `${city.name} hunts` : 'Pick your hunt'}</h2>
         {n > 1 && <button className="see-all" onClick={onSeeAll}>See all {n}</button>}
       </div>
 
+      {returning ? (
+        <div className="route-list tight">
+          {city.routes.map((r) => (
+            <RouteCard key={r.id} compact route={r} status={routeStatus(r, badges, session)} onOpen={() => onOpen(r)} />
+          ))}
+        </div>
+      ) : (
+        <Carousel city={city} focusId={focusId} badges={badges} session={session} onOpen={onOpen} />
+      )}
+    </main>
+  )
+}
+
+function Carousel({ city, focusId, badges, session, onOpen }: { city: City; focusId?: string; badges: EarnedBadge[]; session: Session | null; onOpen: (r: Route) => void }) {
+  const rail = useRef<HTMLDivElement>(null)
+  const n = city.routes.length
+  const start = Math.max(0, city.routes.findIndex((r) => r.id === focusId))
+  const [active, setActive] = useState(start)
+
+  // Open on the route picked last.
+  useEffect(() => {
+    const el = rail.current?.children[start] as HTMLElement | undefined
+    if (el && rail.current) rail.current.scrollLeft = el.offsetLeft - rail.current.offsetLeft - 20
+  }, [start, city.key])
+
+  const onScroll = () => {
+    const el = rail.current
+    if (!el || !el.children.length) return
+    const w = (el.children[0] as HTMLElement).offsetWidth + 14
+    setActive(Math.max(0, Math.min(n - 1, Math.round(el.scrollLeft / w))))
+  }
+
+  return (
+    <>
       <div className="rail" ref={rail} onScroll={onScroll} role="list">
-        {city.routes.map((r) => (
+        {city.routes.map((r, i) => (
           <div role="listitem" key={r.id}>
-            <RouteCard route={r} status={routeStatus(r, badges, session)} onOpen={() => onOpen(r)} />
+            <RouteCard route={r} status={routeStatus(r, badges, session)} onOpen={() => onOpen(r)} tag={i === 0 && n > 1 ? 'Best first hunt' : undefined} />
           </div>
         ))}
       </div>
@@ -106,11 +149,6 @@ export function Home({ city, badges, session, playingRoute, focusId, team, onCit
           {city.routes.map((r, i) => <i key={r.id} className={i === active ? 'on' : ''} />)}
         </div>
       )}
-
-      <div className="home-cta">
-        {current && <button className="btn primary" onClick={() => onOpen(current)}>Play {inSentence(current.name)}</button>}
-        <button className="text-btn" onClick={onJoinTeam}>Have a team code? <b>Join a team</b></button>
-      </div>
-    </main>
+    </>
   )
 }

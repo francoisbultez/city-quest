@@ -77,7 +77,7 @@ export function CityPicker({ cities, current, badges, onPick, onClose, onAddRout
       ) : (
         !q &&
         geo.state !== 'unavailable' && (
-          <button className="locate" onClick={geo.request} disabled={geo.state === 'asking'}>
+          <button className="locate" onClick={() => geo.request()} disabled={geo.state === 'asking'}>
             <IconLocate />
             {geo.state === 'asking' ? 'Finding you…' : geo.state === 'denied' ? 'Location is off. Pick a city below.' : geo.pos ? 'No routes near you yet' : 'Find the nearest city'}
           </button>

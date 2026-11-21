@@ -33,7 +33,7 @@ export function RouteFacts({ route }: { route: Route }) {
 }
 
 /** A route as a card: a big photo card for the home carousel, a row for lists. */
-export function RouteCard({ route, status, onOpen, compact = false }: { route: Route; status: RouteStatus; onOpen: () => void; compact?: boolean }) {
+export function RouteCard({ route, status, onOpen, compact = false, tag }: { route: Route; status: RouteStatus; onOpen: () => void; compact?: boolean; tag?: string }) {
   if (compact) {
     return (
       <button className="route-row" onClick={onOpen} aria-label={`${route.name}: ${route.tagline}`}>
@@ -51,7 +51,7 @@ export function RouteCard({ route, status, onOpen, compact = false }: { route: R
     <button className="route-tile" onClick={onOpen} aria-label={`${route.name}: ${route.tagline}`}>
       <span className="photo">
         <Cover route={route} />
-        {route.kind && <span className="pill on-photo">{route.kind}</span>}
+        {(tag ?? route.kind) && <span className={tag ? 'pill on-photo tag' : 'pill on-photo'}>{tag ?? route.kind}</span>}
         <span className="tile-badge"><Badge size={64} route={route} label="" /></span>
       </span>
       <span className="body">

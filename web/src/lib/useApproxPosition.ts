@@ -11,15 +11,24 @@ export function useApproxPosition() {
   const [pos, setPos] = useState<Pos | null>(null)
   const [state, setState] = useState<'idle' | 'asking' | 'denied' | 'unavailable'>(() => ('geolocation' in navigator ? 'idle' : 'unavailable'))
 
-  const read = useCallback(() => {
-    if (!('geolocation' in navigator)) return setState('unavailable')
+  /** Reads the position; `onDone` gets it, or null when it isn't available. */
+  const read = useCallback((onDone?: (p: Pos | null) => void) => {
+    if (!('geolocation' in navigator)) {
+      setState('unavailable')
+      return onDone?.(null)
+    }
     setState('asking')
     navigator.geolocation.getCurrentPosition(
       (p) => {
-        setPos({ lat: p.coords.latitude, lng: p.coords.longitude })
+        const at = { lat: p.coords.latitude, lng: p.coords.longitude }
+        setPos(at)
         setState('idle')
+        onDone?.(at)
       },
-      (e) => setState(e.code === e.PERMISSION_DENIED ? 'denied' : 'unavailable'),
+      (e) => {
+        setState(e.code === e.PERMISSION_DENIED ? 'denied' : 'unavailable')
+        onDone?.(null)
+      },
       { enableHighAccuracy: false, maximumAge: 10 * 60_000, timeout: 15_000 },
     )
   }, [])

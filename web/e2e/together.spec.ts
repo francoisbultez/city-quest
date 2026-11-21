@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { openRoute, routeFile } from './routes'
+import { openRoute, routeFile, skipWelcome } from './routes'
 
 const solRoute = routeFile('madrid-sol')
 import type { Stop } from '../src/types'
@@ -44,6 +44,7 @@ const option = (p: Page, i: number) => p.locator('.options button').nth(i)
 const FAR_AWAY = { latitude: 40.398, longitude: -3.7036, accuracy: 10 }
 
 test.beforeEach(async ({ context }) => {
+  await skipWelcome(context)
   await context.setGeolocation(at(stops[0]))
 })
 
@@ -124,7 +125,7 @@ test('wrong codes and leaving the team', async ({ context }) => {
   await expect(eve.getByRole('alert')).toHaveText('No team with the code ZZZZ. Check it with your friends.')
 
   await tom.getByRole('button', { name: 'Leave' }).click()
-  await expect(tom.getByRole('heading', { name: 'Explore Madrid' })).toBeVisible()
+  await expect(tom.getByRole('heading', { name: 'Treasure hunts through Madrid' })).toBeVisible()
   await expect(tom.getByRole('button', { name: /Back to your team/ })).toHaveCount(0)
   await expect(ana.getByText('Tom', { exact: true })).toHaveCount(0)
   await expect(ana.getByRole('button', { name: 'Start without waiting' })).toBeVisible()

@@ -485,6 +485,71 @@ h1, h2 { margin: 0; letter-spacing: -0.045em; text-wrap: balance; }
 .segmented button { min-height: 44px; border: 0; border-radius: 999px; background: transparent; font-weight: 650; font-size: 15px; color: var(--muted); transition: background 0.15s, color 0.15s; }
 .segmented button.on { background: #fff; color: var(--ink); box-shadow: var(--shadow-sm); }
 .start-card { isolation: isolate; }
-.home.browse .home-cta { position: sticky; bottom: 0; z-index: 10; margin: auto -20px 0; padding: 14px 20px calc(10px + env(safe-area-inset-bottom)); background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 24%); }
 .home.browse { padding-bottom: 0; }
 .route-tile .photo { aspect-ratio: 16 / 9; }
+
+/* ---------- Welcome, home tabs and You ---------- */
+.welcome { max-width: 480px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+.welcome-hero { position: relative; height: 30vh; min-height: 200px; max-height: 320px; flex: none; }
+.welcome-hero .cover { position: absolute; inset: 0; }
+.welcome-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent 40%, transparent 65%, #fff); }
+.brand.on-photo { position: absolute; z-index: 1; top: calc(18px + env(safe-area-inset-top)); left: 20px; color: #fff; font-size: 16px; font-weight: 700; }
+.welcome-body { position: relative; margin-top: -28px; padding: 0 22px; display: flex; flex-direction: column; gap: 10px; }
+.welcome-body h1 { font-size: 36px; font-weight: 750; line-height: 1.02; letter-spacing: -0.05em; }
+.welcome-body > p { margin: 0; font-size: 16px; line-height: 1.45; color: #55555c; }
+.steps { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 14px; }
+.steps li { display: flex; align-items: center; gap: 14px; }
+.steps b { display: block; font-size: 16px; }
+.steps small { display: block; font-size: 14px; color: var(--muted); }
+.step-icon { width: 44px; height: 44px; flex: none; border-radius: 14px; display: grid; place-items: center; }
+.step-icon.red, .steps.compact li.red { background: #fff1ee; color: var(--accent); }
+.step-icon.blue, .steps.compact li.blue { background: #eef2ff; color: #2f4bff; }
+.step-icon.gold, .steps.compact li.gold { background: #fff8e6; color: #b07800; }
+.steps.compact { margin-top: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.steps.compact li { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px; border-radius: 14px; }
+.steps.compact span { font-size: 12.5px; font-weight: 650; line-height: 1.25; color: var(--ink); }
+.welcome-cta { margin-top: auto; padding: 16px 22px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 6px; }
+.welcome-cta .btn { gap: 8px; }
+.fine { margin: 0; text-align: center; font-size: 13px; color: var(--muted); }
+.welcome-cta .fine { margin-bottom: 6px; }
+
+.avatar-btn { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 0; color: #fff; font-weight: 750; font-size: 18px; display: grid; place-items: center; }
+.avatar-btn.empty { background: var(--soft); color: var(--ink); }
+.hello h1 { font-size: 32px; }
+.city-progress { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
+.city-progress .bar { flex: 1; height: 8px; border-radius: 4px; }
+.city-progress .bar i { border-radius: 4px; }
+.city-progress b { font-size: 13px; }
+.route-list.tight { margin-top: 10px; }
+.pill.on-photo.tag { background: var(--accent); color: #fff; }
+
+.with-tabs { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+.tabbar { position: fixed; z-index: 600; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 480px; margin: 0 auto; padding: 6px 40px calc(8px + env(safe-area-inset-bottom)); background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+.tabbar button { min-height: 52px; border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.tabbar button.on { color: var(--ink); font-weight: 700; }
+
+.you-head { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+.you-head > div { flex: 1; min-width: 0; }
+.you-head h1 { font-size: 28px; font-weight: 750; }
+.you-head p { margin: 2px 0 0; font-size: 13.5px; color: var(--muted); }
+.avatar.big { width: 64px; height: 64px; flex: none; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 750; font-size: 28px; }
+.avatar.big.empty { background: var(--soft); color: var(--muted); }
+.pill-btn { min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-weight: 650; font-size: 13.5px; }
+.you-stats { margin-top: 18px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.you-stats div { padding: 10px 6px; border-radius: 16px; background: var(--soft); text-align: center; display: grid; }
+.you-stats b { font-size: 20px; font-weight: 750; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.you-stats span { font-size: 11.5px; color: var(--muted); }
+.rail-head .count { font-size: 13px; font-weight: 600; color: var(--muted); }
+.badge-grid { margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.badge-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px 10px; border-radius: 18px; border: 0; background: var(--soft); text-align: center; }
+.badge-tile b { font-size: 12.5px; font-weight: 700; line-height: 1.2; }
+.badge-tile span { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.badge-tile .earned { display: inline-flex; align-items: center; gap: 4px; color: #7a5200; }
+.settings { margin-top: 24px; border-radius: 20px; border: 1px solid var(--line); overflow: hidden; }
+.settings > button, .settings > .row { width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; border: 0; border-bottom: 1px solid #f0f0f2; background: #fff; font-size: 15px; font-weight: 600; text-align: left; }
+.settings > :last-child { border-bottom: 0; }
+.settings .value { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 550; color: var(--muted); }
+.settings .value svg { color: var(--ring); }
+.settings .danger { color: var(--warn); }
+.you .fine { margin-top: 14px; }
+.btn.danger-bg { background: var(--warn); }

@@ -55,3 +55,9 @@ export async function roomExists(code: string): Promise<boolean> {
 /** The team this phone is in, so a reload goes straight back. */
 export const loadTeam = () => load<{ code: string } | null>(TEAM_KEY, null)
 export const saveTeam = (t: { code: string } | null) => save(TEAM_KEY, t)
+
+/** Saves the name teammates see (also used to greet you on the home screen). */
+export function saveName(name: string) {
+  const me = load<Me | null>(ME_KEY, null)
+  save(ME_KEY, { id: me?.id ?? '', name: name.trim().slice(0, 16) })
+}

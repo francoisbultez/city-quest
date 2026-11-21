@@ -5,6 +5,9 @@ import { CityPicker } from './components/browse/CityPicker'
 import { CityRoutes } from './components/browse/CityRoutes'
 import { Home } from './components/browse/Home'
 import { RoutePreview } from './components/browse/RoutePreview'
+import { TabBar, type Tab } from './components/browse/TabBar'
+import { Welcome } from './components/browse/Welcome'
+import { You } from './components/browse/You'
 import { Lesson } from './components/Lesson'
 import { Modal } from './components/Modal'
 import { Quiz } from './components/Quiz'
@@ -16,7 +19,8 @@ import { cityKey, citiesFrom, nearestCity } from './lib/cities'
 import { currentStreak, isPerfect, starsFor, stopPoints } from './lib/game'
 import { awardBadge, loadBadges, loadSession, newSession, saveSession, sessionPoints, type Session } from './lib/session'
 import { load, reportClue, save } from './lib/storage'
-import { loadName, loadTeam, openRoom, saveTeam } from './lib/team/room'
+import { loadName, loadTeam, openRoom, saveName, saveTeam } from './lib/team/room'
+import { setWelcomed, welcomed } from './lib/profile'
 import type { Room } from './lib/team/types'
 import { useApproxPosition } from './lib/useApproxPosition'
 import type { Route } from './types'
@@ -44,6 +48,15 @@ export default function App() {
   const autoCity = nearestCity(cities, geo.pos)?.key ?? cityKey(picked.city)
   const city = cities.find((c) => c.key === (cityChoice ?? autoCity)) ?? cities[0]
   const [view, setView] = useState<View>('home')
+  const [tab, setTab] = useState<Tab>('explore')
+  const [name, setName] = useState(loadName)
+  // First launch explains the app, unless the player arrived through an invite or route link.
+  const [showWelcome, setShowWelcome] = useState(() => !welcomed() && !session && !/[?&](team|route)=/.test(window.location.search))
+  const [locating, setLocating] = useState(false)
+  const finishWelcome = () => {
+    setWelcomed()
+    setShowWelcome(false)
+  }
   const [adding, setAdding] = useState(false)
 
   // The phone's back button walks back through these screens.
@@ -167,7 +180,54 @@ export default function App() {
 
   if (atHome || !session) {
     let screen
-    if (view === 'cities') {
+    if (showWelcome && view === 'home') {
+      screen = (
+        <Welcome
+          hero={routes[0]}
+          locating={locating}
+          onNearMe={() => {
+            setLocating(true)
+            // Open the nearest city once the phone knows where it is.
+            geo.request((at) => {
+              setLocating(false)
+              finishWelcome()
+              const near = nearestCity(cities, at)
+              if (near) return pickCity(near.key)
+              if (at) flash('No hunts near you yet. Pick a city to explore.')
+              go('cities')
+            })
+          }}
+          onChoose={() => {
+            finishWelcome()
+            go('cities')
+          }}
+        />
+      )
+    } else if (view === 'home' && tab === 'you') {
+      screen = (
+        <You
+          routes={routes}
+          badges={badges}
+          name={name}
+          onName={(n) => {
+            saveName(n)
+            setName(n)
+          }}
+          onOpen={(r) => {
+            pickCity(cityKey(r.city))
+            openRoute(r)
+          }}
+          onAddRoute={() => setAdding(true)}
+          onJoinTeam={() => setTeamView('join')}
+          onReset={() => {
+            save('cq.badges', null)
+            setBadges([])
+            update(null)
+            flash('Progress reset.')
+          }}
+        />
+      )
+    } else if (view === 'cities') {
       screen = (
         <CityPicker
           cities={cities}
@@ -215,13 +275,15 @@ export default function App() {
           onOpen={openRoute}
           onResume={() => setAtHome(false)}
           onTeam={() => setTeamView('play')}
-          onJoinTeam={() => setTeamView('join')}
+          name={name}
+          onYou={() => setTab('you')}
         />
       )
     }
     return (
       <>
         {screen}
+        {view === 'home' && !(showWelcome) && <TabBar tab={tab} onTab={setTab} />}
         {adding && (
           <AddRoute
             onClose={() => setAdding(false)}
