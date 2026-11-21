@@ -26,6 +26,19 @@
   "author": {
     "name": "City Quest"
   },
+  "startTransit": "Metro Usera, line 6",
+  "ends": {
+    "name": "Maris Stella, Parque de Pradolongo"
+  },
+  "terrain": {
+    "title": "Easy walking",
+    "text": "Some slopes inside Pradolongo park"
+  },
+  "goodFor": [
+    "off-the-beaten-track",
+    "kids"
+  ],
+  "highlight": "Off the tourist trail",
   "stops": [
     {
       "id": "usera-metro",

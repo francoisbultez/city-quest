@@ -41,11 +41,11 @@ test('plays the whole Sol Route solo and unlocks the badge', async ({ page }) =>
   const errors = trackErrors(page)
   await page.goto('/')
   await expect(page.getByRole('button', { name: 'Change city, now Madrid' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Treasure hunts through Madrid' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Pick your hunt' })).toBeVisible()
-  await expect(page.getByText('Best first hunt')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What shall we explore today?' })).toBeVisible()
+  await expect(page.getByText('Great first walk')).toBeVisible()
+  await expect(page.getByText('Starts at Metro Sol')).toBeVisible()
   await openRoute(page, solRoute)
-  await expect(page.getByText('8', { exact: true })).toBeVisible() // secret stops
+  await expect(page.getByText('8 secret stops')).toBeVisible()
   await page.getByRole('button', { name: 'Start at the Puerta del Sol' }).click()
 
   for (const [i, s] of stops.entries()) {
@@ -95,34 +95,32 @@ test('plays the whole Sol Route solo and unlocks the badge', async ({ page }) =>
     }
 
     const last = i === stops.length - 1
-    await page.getByRole('button', { name: last ? 'See my badge' : 'Next riddle' }).click()
+    await page.getByRole('button', { name: last ? 'See my souvenir' : 'Next riddle' }).click()
   }
 
-  await expect(page.getByText('New badge unlocked')).toBeVisible()
-  await expect(page.getByRole('img', { name: 'Solo badge: MADRID, THE SOL ROUTE' })).toBeVisible()
+  await expect(page.getByText('You did it')).toBeVisible()
+  await expect(page.getByRole('figure', { name: /^Souvenir: Madrid, The Sol Route/ })).toBeVisible()
   // 6 perfect stops (100) + one wrong try (80) + one hint (60) + one quick check (10) = 750 → 3 stars
   await expect(page.getByTestId('final-score')).toHaveText('750')
-  await expect(page.getByRole('img', { name: '3 of 3 stars' })).toBeVisible()
-  await expect(page.getByText('6/8')).toBeVisible()
-  await expect(page.getByText('1 of 8 quick checks right · 1 details spotted')).toBeVisible()
+  await expect(page.getByRole('figure').getByLabel('3 of 3 stars')).toBeVisible()
+  await expect(page.getByText('points · 6 of 8 first try')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Save image' })).toBeVisible()
 
   // The recap reopens any lesson.
-  await expect(page.getByRole('heading', { name: '8 places you discovered' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Read the 8 stories again' })).toBeVisible()
   await page.getByRole('button', { name: new RegExp(stops[2].lesson.title) }).click()
   await expect(page.getByRole('heading', { level: 1, name: stops[2].lesson.title })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Timeline' })).toBeVisible()
-  await page.getByRole('button', { name: 'Back to my badge' }).first().click()
-  await expect(page.getByText('New badge unlocked')).toBeVisible()
+  await page.getByRole('button', { name: 'Back to my souvenir' }).first().click()
+  await expect(page.getByText('You did it')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Back to start' }).click()
-  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
-  await expect(page.getByText('1 of 2 Madrid badges. One more to complete the city.')).toBeVisible()
-  await expect(page.getByText('Best 750 pts')).toBeVisible()
+  await page.getByRole('button', { name: 'Back to Madrid' }).click()
+  await expect(page.getByRole('button', { name: /^The Sol Route:/ }).getByText('Played')).toBeVisible()
   // The preview remembers it too, and the phone's back button returns home.
   await openRoute(page, solRoute)
-  await expect(page.getByText('Your best: 750 points. A perfect run!')).toBeVisible()
+  await expect(page.getByText(/You played this on/)).toBeVisible()
   await page.goBack()
-  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What shall we explore today?' })).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -186,8 +184,8 @@ test('pause menu: report a problem, then leave the route', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Pause' }).click()
   await page.getByRole('button', { name: 'Leave the route' }).click()
-  await expect(page.getByRole('heading', { name: 'Treasure hunts through Madrid' })).toBeVisible()
-  await expect(page.getByRole('button', { name: /^Continue/ })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'What shall we explore today?' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Continue the Sol Route/i })).toHaveCount(0)
 })
 
 
@@ -202,7 +200,7 @@ test('test mode lets you teleport to each stop', async ({ page, context }) => {
   await page.getByRole('button', { name: /Teleport to this stop/ }).click()
   await expect(page.getByText('You found it!')).toBeVisible()
   await page.goto('/?test=off')
-  await page.getByRole('button', { name: /^Continue/ }).click()
+  await page.getByRole('button', { name: /Continue the Sol Route/i }).click()
   await expect(page.getByRole('button', { name: /Teleport/ })).toHaveCount(0)
 })
 
@@ -214,7 +212,7 @@ test('keeps working offline once loaded', async ({ page, context }) => {
 
   await context.setOffline(true)
   await page.reload()
-  await expect(page.getByRole('heading', { name: 'Treasure hunts through Madrid' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What shall we explore today?' })).toBeVisible()
   await openRoute(page, solRoute)
   await page.getByRole('button', { name: /^Start at the/ }).click()
   await page.getByRole('button', { name: 'Open the quiz' }).click()

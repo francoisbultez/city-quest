@@ -17,7 +17,7 @@ for (const id of builtInIds()) {
     await context.setGeolocation(at(route.stops[0]))
     await page.goto('/')
     await openRoute(page, route)
-    await expect(page.getByText(route.duration.replace(/^~/, ''), { exact: true })).toBeVisible()
+    await expect(page.getByText(`About ${route.duration.replace(/^~/, '')}`, { exact: true })).toBeVisible()
     await page.getByRole('button', { name: `Start at ${route.start}` }).click()
 
     for (const [i, s] of route.stops.entries()) {
@@ -27,16 +27,16 @@ for (const id of builtInIds()) {
       await page.locator('.options button').nth(s.options.indexOf(s.answer)).click()
       await expect(page.getByRole('heading', { level: 1, name: s.lesson.title })).toBeVisible()
       if (s.lesson.image) await expect(page.locator('.lesson-photo img')).toHaveJSProperty('complete', true)
-      await page.getByRole('button', { name: i === route.stops.length - 1 ? 'See my badge' : 'Next riddle' }).click()
+      await page.getByRole('button', { name: i === route.stops.length - 1 ? 'See my souvenir' : 'Next riddle' }).click()
     }
-    await expect(page.getByText('New badge unlocked')).toBeVisible()
+    await expect(page.getByText('You did it')).toBeVisible()
     await expect(page.getByTestId('final-score')).toHaveText(String(route.stops.length * 100))
-    await expect(page.getByRole('img', { name: new RegExp(route.badgeLine) })).toBeVisible()
+    await expect(page.getByRole('figure', { name: new RegExp(`^Souvenir: ${route.city}, ${route.name}`) })).toBeVisible()
 
-    // The choice is remembered and the route now shows its badge.
-    await page.getByRole('button', { name: 'Back to start' }).click()
+    // The trip is remembered and the city's home shows it was played.
+    await page.getByRole('button', { name: `Back to ${route.city}` }).click()
     await expect(page.getByRole('button', { name: `Change city, now ${route.city}` })).toBeVisible()
-    await expect(page.getByRole('button', { name: new RegExp(`^${route.name}:`) }).getByText(/Best \d+ pts/)).toBeVisible()
+    await expect(page.getByRole('button', { name: new RegExp(`^${route.name}:`) }).getByText('Played')).toBeVisible()
     expect(errors).toEqual([])
   })
 }
@@ -89,7 +89,7 @@ test('add a route someone else made, from a link', async ({ page, context }) => 
   await page.goto(`/?route=${encodeURIComponent(LINK)}`)
   await expect(page.getByRole('status')).toHaveText('Added “Lisboa · The Tiny Tram Route”')
   await expect(page).toHaveURL(/\/$/)
-  await expect(page.getByRole('heading', { name: 'Treasure hunts through Lisboa' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What shall we explore today?' })).toBeVisible()
   await openRoute(page, tinyRoute)
   await expect(page.getByRole('img', { name: /LISBOA, TINY TRAM/ })).toBeVisible()
   await expect(page.getByText('Route by A player')).toBeVisible()
@@ -105,7 +105,7 @@ test('add a route someone else made, from a link', async ({ page, context }) => 
   // Still there after a reload, without the link.
   await page.goto('/')
   await expect(page.getByRole('button', { name: 'Change city, now Lisboa' })).toBeVisible()
-  await expect(page.getByRole('button', { name: /Continue.*The Tiny Tram Route/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Continue the Tiny Tram Route/i })).toBeVisible()
 })
 
 test('a broken route file is refused with the reason', async ({ page, context }) => {

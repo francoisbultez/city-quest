@@ -59,6 +59,12 @@ The full, always-current definition is `web/src/engine/schema.ts`, exported as `
 | `localLanguage` | no | `{ "code": "pt", "name": "Portuguese" }`, which titles the words section |
 | `theme` | no | `{ "colors": ["#006600", "#ffcc00"] }`, the badge's outer and band colours, also used for the confetti |
 | `cover` | no | The photo on route cards and the preview (same shape as a lesson photo). Defaults to the first stop's photo |
+| `startTransit` | no | Nearest transport to the start: `"Metro Sol, right outside"`. Shown on the card and the preview |
+| `ends` | no | `{ "name": "Templo de Debod", "transit": "A short walk from Metro Plaza de España" }`. Without it, the end stays a surprise |
+| `bestTime` | no | `{ "title": "Best late afternoon", "text": "You finish at a sunset spot" }` |
+| `terrain` | no | `{ "title": "Mostly flat", "text": "Steep steps at the arch" }` |
+| `goodFor` | no | Any of `kids`, `sunset`, `first-visit`, `off-the-beaten-track`. Drives the home filters (With kids, Sunset) |
+| `highlight` | no | Short green tag on the card: `"Great first walk"` |
 | `region` | no | Shown in the city list, e.g. `"Castilla-La Mancha"` |
 | `kind` | no | Short label on the route card, e.g. `"Classic"` or `"Neighbourhood"`. With 4 or more routes in a city, the list can be filtered by it |
 | `country`, `author` | no | `"PT"`, `{ "name": "…", "url": "https://…" }`. An author other than City Quest is credited on the route preview |

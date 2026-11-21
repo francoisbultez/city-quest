@@ -20,7 +20,7 @@ function trackErrors(page: Page) {
 async function makeTeam(ana: Page, tom: Page) {
   await ana.goto('/')
   await openRoute(ana, solRoute)
-  await ana.getByRole('button', { name: /^Together/ }).click()
+  await ana.getByRole('button', { name: 'Each on their phone' }).click()
   await ana.getByRole('button', { name: 'Start or join a team' }).click()
   await ana.getByLabel('Your name').fill('Ana')
   await ana.getByRole('button', { name: 'Start a new team' }).click()
@@ -82,7 +82,7 @@ test('two phones play the whole route together and share one team badge', async 
     for (const p of both(ana, tom)) await expect(p.getByRole('heading', { level: 1, name: s.lesson.title })).toBeVisible()
 
     // The team moves on when both are ready.
-    const next = i === stops.length - 1 ? 'See our badge' : 'Next riddle'
+    const next = i === stops.length - 1 ? 'See our souvenir' : 'Next riddle'
     await ana.getByRole('button', { name: next }).click()
     await expect(ana.getByRole('button', { name: 'Waiting for Tom' })).toBeVisible()
     await tom.getByRole('button', { name: next }).click()
@@ -90,9 +90,9 @@ test('two phones play the whole route together and share one team badge', async 
 
   for (const p of both(ana, tom)) {
     await expect(p.getByText('Team badge unlocked')).toBeVisible()
-    await expect(p.getByRole('img', { name: /Team badge/ })).toBeVisible()
+    await expect(p.getByRole('figure', { name: /^Souvenir: Madrid, The Sol Route/ })).toBeVisible()
     await expect(p.getByTestId('final-score')).toHaveText('780')
-    await expect(p.getByText('Team · Ana and Tom')).toBeVisible()
+    await expect(p.getByRole('figure').getByText(/^Ana & Tom · /)).toBeVisible()
     await expect(p.getByTestId('award')).toBeVisible()
   }
   await expect(ana.getByTestId('award')).toContainText('Sharp eyes')
@@ -125,7 +125,7 @@ test('wrong codes and leaving the team', async ({ context }) => {
   await expect(eve.getByRole('alert')).toHaveText('No team with the code ZZZZ. Check it with your friends.')
 
   await tom.getByRole('button', { name: 'Leave' }).click()
-  await expect(tom.getByRole('heading', { name: 'Treasure hunts through Madrid' })).toBeVisible()
+  await expect(tom.getByRole('heading', { name: 'What shall we explore today?' })).toBeVisible()
   await expect(tom.getByRole('button', { name: /Back to your team/ })).toHaveCount(0)
   await expect(ana.getByText('Tom', { exact: true })).toHaveCount(0)
   await expect(ana.getByRole('button', { name: 'Start without waiting' })).toBeVisible()

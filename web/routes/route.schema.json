@@ -64,6 +64,82 @@
       "minLength": 1,
       "maxLength": 20
     },
+    "startTransit": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "ends": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "transit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "bestTime": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "terrain": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "goodFor": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "kids",
+          "sunset",
+          "first-visit",
+          "off-the-beaten-track"
+        ]
+      }
+    },
+    "highlight": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32
+    },
     "cover": {
       "type": "object",
       "properties": {

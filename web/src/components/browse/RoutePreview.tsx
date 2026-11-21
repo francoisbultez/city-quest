@@ -1,21 +1,15 @@
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { useState } from 'react'
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
-import { bestBadge } from '../../lib/cities'
 import { routeKm } from '../../lib/route'
-import type { EarnedBadge, Session } from '../../lib/session'
+import type { Session } from '../../lib/session'
+import { formatTripDate, type Trip } from '../../lib/trips'
 import type { Route } from '../../types'
 import { Badge } from '../Badge'
-import { IconChevron, IconClock, IconExternal, IconFlag, IconWalk, Stars } from '../icons'
+import { IconChevron, IconClock, IconExternal, IconFlag, IconUsers, IconWalk, Stars } from '../icons'
 import { Cover } from './Cover'
-
-const TILES = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-const startIcon = L.divIcon({ className: '', html: '<div class="pin small">1</div>', iconSize: [32, 32], iconAnchor: [16, 16] })
 
 interface Props {
   route: Route
-  badges: EarnedBadge[]
+  lastTrip?: Trip
   session: Session | null
   team: string | null
   onBack: () => void
@@ -24,14 +18,19 @@ interface Props {
   onTogether: () => void
 }
 
-/** What a route is before you start it. Only the start is shown: the stops stay secret. */
-export function RoutePreview({ route, badges, session, team, onBack, onStart, onResume, onTogether }: Props) {
+/** "Can I do this now?": where it starts and ends, how long, when to go, what the walking is like. */
+export function RoutePreview({ route, lastTrip, session, team, onBack, onStart, onResume, onTogether }: Props) {
   const [mode, setMode] = useState<'solo' | 'team'>(team ? 'team' : 'solo')
   const first = route.stops[0].place
-  const best = bestBadge(route.id, badges)
   const inProgress = session && session.routeId === route.id && session.screen !== 'end'
   const startName = route.start.replace(/^the /, '')
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${first.lat},${first.lng}`
+  const directions = `https://www.google.com/maps/dir/?api=1&destination=${first.lat},${first.lng}&travelmode=walking`
+  const facts = [
+    { icon: <IconClock size={18} />, title: `About ${route.duration.replace(/^~/, '')}`, text: `${routeKm(route.stops).toFixed(1)} km at an easy pace, stories included` },
+    route.bestTime && { icon: <IconSun />, title: route.bestTime.title, text: route.bestTime.text },
+    route.terrain && { icon: <IconWalk size={18} />, title: route.terrain.title, text: route.terrain.text },
+    route.goodFor?.includes('kids') && { icon: <IconUsers size={18} />, title: 'Good with kids', text: 'Short legs between stops, lots to spot' },
+  ].filter((f): f is { icon: React.JSX.Element; title: string; text: string | undefined } => !!f)
 
   return (
     <main className="preview enter">
@@ -47,43 +46,44 @@ export function RoutePreview({ route, badges, session, team, onBack, onStart, on
         <div className="preview-title">
           <span className="eyebrow">{[route.city, route.kind].filter(Boolean).join(' · ')}</span>
           <h1>{route.name}</h1>
-          <p>{route.tagline}</p>
+          <p>{route.tagline}. The stops stay secret until you solve each riddle.</p>
         </div>
 
-        <div className="preview-stats">
-          <div><IconWalk size={18} /><b>{routeKm(route.stops).toFixed(1)} km</b><span>on foot</span></div>
-          <div><IconClock size={18} /><b>{route.duration.replace(/^~/, '')}</b><span>with lessons</span></div>
-          <div><IconFlag size={18} /><b>{route.stops.length}</b><span>secret stops</span></div>
-        </div>
-
-        {best && (
-          <div className="best">
-            <Stars n={best.stars} />
-            <span>Your best: <b>{best.points} points</b>{best.stars < 3 ? '. Go for 3 stars?' : '. A perfect run!'}</span>
+        <section className="journey" aria-label="Where it starts and ends">
+          <div className="ends">
+            <span className="line" aria-hidden="true"><i className="a" /><i className="dots" /><i className="b" /></span>
+            <span className="places">
+              <span><b>Starts: {startName.charAt(0).toUpperCase() + startName.slice(1)}</b>{route.startTransit && <small>{route.startTransit}</small>}</span>
+              <span>
+                <b>Ends: {route.ends?.name ?? 'a surprise'}</b>
+                <small>{route.ends ? route.ends.transit ?? `${route.stops.length} stops later` : 'The last stop stays secret'}</small>
+              </span>
+            </span>
+            <a className="directions" href={directions} target="_blank" rel="noreferrer">Directions <IconExternal /></a>
           </div>
-        )}
-
-        <section className="start-card">
-          <div className="start-map" aria-hidden="true">
-            <MapContainer center={[first.lat, first.lng]} zoom={15} zoomControl={false} attributionControl={false} dragging={false} scrollWheelZoom={false} doubleClickZoom={false} touchZoom={false} keyboard={false} boxZoom={false}>
-              <TileLayer url={TILES} subdomains="abcd" maxZoom={20} />
-              <Marker position={[first.lat, first.lng]} icon={startIcon} interactive={false} />
-            </MapContainer>
-          </div>
-          <div className="start-txt">
-            <span className="eyebrow">Where it starts</span>
-            <b>{startName.charAt(0).toUpperCase() + startName.slice(1)}</b>
-            <a href={mapsUrl} target="_blank" rel="noreferrer">Open in maps <IconExternal /></a>
+          <div className="facts-grid">
+            {facts.map((f) => (
+              <div key={f.title}>
+                <span className="fact-icon" aria-hidden="true">{f.icon}</span>
+                <span><b>{f.title}</b>{f.text && <small>{f.text}</small>}</span>
+              </div>
+            ))}
           </div>
         </section>
-        <p className="secret">The other stops stay secret: each riddle leads you to the next one.</p>
+
+        {lastTrip && (
+          <p className="played-line">
+            <Stars n={lastTrip.stars} /> You played this on {formatTripDate(lastTrip.date, false)}
+          </p>
+        )}
         {route.author && route.author.name !== 'City Quest' && <p className="by">Route by {route.author.name}</p>}
+        <p className="secret"><IconFlag size={14} /> {route.stops.length} secret stops</p>
       </div>
 
       <div className="preview-cta">
-        <div className="segmented" role="group" aria-label="How to play">
-          <button className={mode === 'solo' ? 'on' : ''} aria-pressed={mode === 'solo'} onClick={() => setMode('solo')}>Solo</button>
-          <button className={mode === 'team' ? 'on' : ''} aria-pressed={mode === 'team'} onClick={() => setMode('team')}>Together</button>
+        <div className="segmented" role="group" aria-label="Who is playing">
+          <button className={mode === 'solo' ? 'on' : ''} aria-pressed={mode === 'solo'} onClick={() => setMode('solo')}>One phone</button>
+          <button className={mode === 'team' ? 'on' : ''} aria-pressed={mode === 'team'} onClick={() => setMode('team')}>Each on their phone</button>
         </div>
         {mode === 'team' ? (
           <button className="btn primary" onClick={onTogether}>{team ? `Back to your team · ${team}` : 'Start or join a team'}</button>
@@ -99,3 +99,7 @@ export function RoutePreview({ route, badges, session, team, onBack, onStart, on
     </main>
   )
 }
+
+const IconSun = () => (
+  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+)

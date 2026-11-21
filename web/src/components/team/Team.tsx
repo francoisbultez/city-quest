@@ -10,6 +10,8 @@ import { Modal } from '../Modal'
 import type { Mate } from '../RouteMap'
 import { Walk } from '../Walk'
 import { TeamEnd } from './TeamEnd'
+import { teamTrip } from '../../lib/team/trip'
+import { addTrip } from '../../lib/trips'
 import { TeamLobby } from './TeamLobby'
 import { TeamQuiz } from './TeamQuiz'
 
@@ -35,7 +37,8 @@ export function Team({ room, onExit, onBadges }: Props) {
     if (!game || game.screen !== 'end' || awarded.current) return
     awarded.current = true
     onBadges(awardBadge({ routeId: route.id, mode: 'team', stars: starsFor(points, total), points, date: new Date(game.finishedAt ?? room.now()).toISOString() }))
-  }, [game, points, total, route.id, room, onBadges])
+    addTrip(teamTrip(route, game, points))
+  }, [game, points, total, route, room, onBadges])
 
   const leave = () => {
     actions.leave()
@@ -94,7 +97,7 @@ export function Team({ room, onExit, onBadges }: Props) {
         spotted={spottedFor(stop.id)}
         onCheck={(o) => actions.check(stop.id, o)}
         onSpot={(i) => actions.spot(stop.id, i)}
-        actionLabel={ready ? `Waiting for ${listNames(waitingFor)}` : isLast ? 'See our badge' : 'Next riddle'}
+        actionLabel={ready ? `Waiting for ${listNames(waitingFor)}` : isLast ? 'See our souvenir' : 'Next riddle'}
         onAction={actions.ready}
       />
     )
@@ -112,7 +115,7 @@ export function Team({ room, onExit, onBadges }: Props) {
         spotted={spottedFor(rs.id)}
         onCheck={(o) => actions.check(rs.id, o)}
         onSpot={(i) => actions.spot(rs.id, i)}
-        actionLabel="Back to our badge"
+        actionLabel="Back to our souvenir"
         onAction={() => setReview(null)}
         onBack={() => setReview(null)}
       />

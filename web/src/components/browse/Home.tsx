@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
-import { badgesIn, type City, routeStatus } from '../../lib/cities'
-import { avatarColor } from '../../lib/profile'
+import { useState } from 'react'
+import { bestBadge, durationMinutes, type City } from '../../lib/cities'
+import { distanceM } from '../../lib/route'
 import type { EarnedBadge, Session } from '../../lib/session'
+import { useApproxPosition } from '../../lib/useApproxPosition'
 import type { Route } from '../../types'
-import { IconChevron, IconPin, IconUser, IconUsers } from '../icons'
+import { IconChevron, IconPin, IconUsers } from '../icons'
 import { Cover } from './Cover'
 import { RouteCard } from './RouteCard'
-import { Steps } from './Steps'
+
+type Filter = 'short' | 'near' | 'kids' | 'sunset'
 
 interface Props {
   city: City
@@ -14,24 +16,40 @@ interface Props {
   session: Session | null
   /** Route of the solo game in progress, if any. */
   playingRoute?: Route
-  /** Route to show first in the carousel. */
-  focusId?: string
   team: string | null
-  name: string
   onCities: () => void
-  onSeeAll: () => void
   onOpen: (route: Route) => void
   onResume: () => void
   onTeam: () => void
-  onYou: () => void
 }
 
-export function Home({ city, badges, session, playingRoute, focusId, team, name, onCities, onSeeAll, onOpen, onResume, onTeam, onYou }: Props) {
-  const n = city.routes.length
+/** Pick today's walk: practical cards, quick filters, and the hunt you paused. */
+export function Home({ city, badges, session, playingRoute, team, onCities, onOpen, onResume, onTeam }: Props) {
+  const [filter, setFilter] = useState<Filter | null>(null)
+  const geo = useApproxPosition()
   const playing = session && session.screen !== 'end' && playingRoute ? session : null
-  const earned = badgesIn(city, badges)
-  // Someone who has played before sees their progress first; a newcomer sees what the app is.
-  const returning = badges.length > 0 || !!playing || !!team
+  const routes = city.routes
+  const short = (r: Route) => (durationMinutes(r.duration) ?? Infinity) <= 120
+  // Only offer filters that actually split this city's routes.
+  const filters: { id: Filter; label: string }[] = []
+  if (routes.length > 1) {
+    if (routes.some(short) && !routes.every(short)) filters.push({ id: 'short', label: 'Under 2 h' })
+    if (geo.state !== 'unavailable') filters.push({ id: 'near', label: 'Near me' })
+    if (routes.some((r) => r.goodFor?.includes('kids'))) filters.push({ id: 'kids', label: 'With kids' })
+    if (routes.some((r) => r.goodFor?.includes('sunset'))) filters.push({ id: 'sunset', label: 'Sunset' })
+  }
+  const startKm = (r: Route) => (geo.pos ? distanceM(geo.pos, r.stops[0].place) / 1000 : undefined)
+  let shown = routes
+  if (filter === 'short') shown = routes.filter(short)
+  if (filter === 'kids') shown = routes.filter((r) => r.goodFor?.includes('kids'))
+  if (filter === 'sunset') shown = routes.filter((r) => r.goodFor?.includes('sunset'))
+  if (filter === 'near' && geo.pos) shown = [...routes].sort((a, b) => startKm(a)! - startKm(b)!)
+
+  const pick = (f: Filter) => {
+    if (filter === f) return setFilter(null)
+    setFilter(f)
+    if (f === 'near' && !geo.pos) geo.request()
+  }
 
   return (
     <main className="home browse with-tabs enter">
@@ -41,48 +59,21 @@ export function Home({ city, badges, session, playingRoute, focusId, team, name,
           {city.name}
           <IconChevron dir="down" size={15} />
         </button>
-        {name ? (
-          <button className="avatar-btn" style={{ background: avatarColor(name) }} onClick={onYou} aria-label={`You: ${name}`}>
-            {name.slice(0, 1).toUpperCase()}
-          </button>
-        ) : (
-          <button className="avatar-btn empty" onClick={onYou} aria-label="You">
-            <IconUser size={20} />
-          </button>
-        )}
+        <span className="brand"><span className="dot" aria-hidden="true" />City Quest</span>
       </header>
 
-      {returning ? (
-        <div className="hello">
-          <h1>{name ? `Hola, ${name}` : 'Welcome back'}</h1>
-          <p>
-            {earned === n
-              ? `${city.name} complete: you earned every badge here.`
-              : earned > 0
-                ? `${earned} of ${n} ${city.name} badges. ${n - earned === 1 ? 'One more' : `${n - earned} more`} to complete the city.`
-                : `${n} ${n === 1 ? 'hunt' : 'hunts'} to play in ${city.name}.`}
-          </p>
-          <div className="city-progress" aria-hidden="true">
-            <span className="bar"><i style={{ width: `${(100 * earned) / n}%` }} /></span>
-            <b>{earned}/{n}</b>
-          </div>
-        </div>
-      ) : (
-        <div className="hello">
-          <h1>Treasure hunts through {city.name}</h1>
-          <p>Follow riddles across the city, answer what you see, earn the badge.</p>
-          <Steps compact />
-        </div>
-      )}
+      <div className="hello">
+        <h1>What shall we explore today?</h1>
+        <p>Treasure hunts on foot through {city.name}. Pick one that fits your {routes.length > 1 ? 'afternoon' : 'day'}.</p>
+      </div>
 
       {playing && playingRoute && (
         <button className="resume-card" onClick={onResume}>
           <Cover route={playingRoute} className="thumb" />
           <span className="txt">
-            <span className="eyebrow">Continue</span>
-            <b>{playingRoute.name}</b>
-            <span className="bar" aria-hidden="true"><i style={{ width: `${(100 * playing.index) / playingRoute.stops.length}%` }} /></span>
-            <small>Stop {playing.index + 1} of {playingRoute.stops.length} · {playingRoute.city}</small>
+            <span className="eyebrow">Pick up where you left off</span>
+            <b>Continue {playingRoute.name.replace(/^The /, 'the ')}</b>
+            <small>Stop {playing.index + 1} of {playingRoute.stops.length}{playingRoute.city !== city.name ? ` · ${playingRoute.city}` : ''}</small>
           </span>
           <IconChevron />
         </button>
@@ -91,64 +82,30 @@ export function Home({ city, badges, session, playingRoute, focusId, team, name,
         <button className="resume-card team" onClick={onTeam}>
           <span className="thumb icon"><IconUsers size={22} /></span>
           <span className="txt">
-            <span className="eyebrow">Together</span>
+            <span className="eyebrow">Each on their phone</span>
             <b>Back to your team · {team}</b>
           </span>
           <IconChevron />
         </button>
       )}
 
-      <div className="rail-head">
-        <h2>{returning ? `${city.name} hunts` : 'Pick your hunt'}</h2>
-        {n > 1 && <button className="see-all" onClick={onSeeAll}>See all {n}</button>}
-      </div>
-
-      {returning ? (
-        <div className="route-list tight">
-          {city.routes.map((r) => (
-            <RouteCard key={r.id} compact route={r} status={routeStatus(r, badges, session)} onOpen={() => onOpen(r)} />
+      {filters.length > 0 && (
+        <div className="filters" role="group" aria-label="Filter hunts">
+          <button className={filter === null ? 'on' : ''} aria-pressed={filter === null} onClick={() => setFilter(null)}>All</button>
+          {filters.map((f) => (
+            <button key={f.id} className={filter === f.id ? 'on' : ''} aria-pressed={filter === f.id} onClick={() => pick(f.id)}>{f.label}</button>
           ))}
         </div>
-      ) : (
-        <Carousel city={city} focusId={focusId} badges={badges} session={session} onOpen={onOpen} />
       )}
-    </main>
-  )
-}
+      {filter === 'near' && geo.state === 'denied' && <p className="hint-line">Location is off, so hunts can’t be sorted by distance.</p>}
 
-function Carousel({ city, focusId, badges, session, onOpen }: { city: City; focusId?: string; badges: EarnedBadge[]; session: Session | null; onOpen: (r: Route) => void }) {
-  const rail = useRef<HTMLDivElement>(null)
-  const n = city.routes.length
-  const start = Math.max(0, city.routes.findIndex((r) => r.id === focusId))
-  const [active, setActive] = useState(start)
-
-  // Open on the route picked last.
-  useEffect(() => {
-    const el = rail.current?.children[start] as HTMLElement | undefined
-    if (el && rail.current) rail.current.scrollLeft = el.offsetLeft - rail.current.offsetLeft - 20
-  }, [start, city.key])
-
-  const onScroll = () => {
-    const el = rail.current
-    if (!el || !el.children.length) return
-    const w = (el.children[0] as HTMLElement).offsetWidth + 14
-    setActive(Math.max(0, Math.min(n - 1, Math.round(el.scrollLeft / w))))
-  }
-
-  return (
-    <>
-      <div className="rail" ref={rail} onScroll={onScroll} role="list">
-        {city.routes.map((r, i) => (
-          <div role="listitem" key={r.id}>
-            <RouteCard route={r} status={routeStatus(r, badges, session)} onOpen={() => onOpen(r)} tag={i === 0 && n > 1 ? 'Best first hunt' : undefined} />
-          </div>
-        ))}
+      <div className="visit-list">
+        {shown.map((r) => {
+          const b = bestBadge(r.id, badges)
+          return <RouteCard key={r.id} route={r} played={b && { stars: b.stars }} distanceKm={filter === 'near' ? startKm(r) : undefined} onOpen={() => onOpen(r)} />
+        })}
+        {shown.length === 0 && <p className="empty">No hunt matches that here yet.</p>}
       </div>
-      {n > 1 && (
-        <div className="dots" aria-hidden="true">
-          {city.routes.map((r, i) => <i key={r.id} className={i === active ? 'on' : ''} />)}
-        </div>
-      )}
-    </>
+    </main>
   )
 }

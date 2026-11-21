@@ -1,6 +1,6 @@
-import { IconCompass, IconUser } from '../icons'
+import { IconCompass, IconPhotos } from '../icons'
 
-export type Tab = 'explore' | 'you'
+export type Tab = 'explore' | 'trips'
 
 export function TabBar({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
   return (
@@ -9,9 +9,9 @@ export function TabBar({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
         <IconCompass />
         Explore
       </button>
-      <button className={tab === 'you' ? 'on' : ''} aria-current={tab === 'you' ? 'page' : undefined} onClick={() => onTab('you')}>
-        <IconUser />
-        You
+      <button className={tab === 'trips' ? 'on' : ''} aria-current={tab === 'trips' ? 'page' : undefined} onClick={() => onTab('trips')}>
+        <IconPhotos />
+        Your trips
       </button>
     </nav>
   )

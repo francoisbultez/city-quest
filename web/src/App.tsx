@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import { End } from './components/End'
 import { AddRoute } from './components/browse/AddRoute'
 import { CityPicker } from './components/browse/CityPicker'
-import { CityRoutes } from './components/browse/CityRoutes'
 import { Home } from './components/browse/Home'
 import { RoutePreview } from './components/browse/RoutePreview'
 import { TabBar, type Tab } from './components/browse/TabBar'
 import { Welcome } from './components/browse/Welcome'
-import { You } from './components/browse/You'
+import { Trips } from './components/browse/Trips'
+import { TripView } from './components/browse/TripView'
 import { Lesson } from './components/Lesson'
 import { Modal } from './components/Modal'
 import { Quiz } from './components/Quiz'
@@ -21,11 +21,15 @@ import { awardBadge, loadBadges, loadSession, newSession, saveSession, sessionPo
 import { load, reportClue, save } from './lib/storage'
 import { loadName, loadTeam, openRoom, saveName, saveTeam } from './lib/team/room'
 import { setWelcomed, welcomed } from './lib/profile'
+import { addTrip, clearTrips, loadTrips, type Trip } from './lib/trips'
 import type { Room } from './lib/team/types'
 import { useApproxPosition } from './lib/useApproxPosition'
 import type { Route } from './types'
 
-type View = 'home' | 'cities' | 'routes' | 'preview'
+type View = 'home' | 'cities' | 'preview' | 'trip' | 'story'
+
+/** Current time; kept outside components so it only runs in event handlers. */
+const now = () => Date.now()
 
 const REASONS = ['Can’t find it', 'Answer looks wrong', 'Covered or closed', 'Other']
 
@@ -89,6 +93,10 @@ export default function App() {
     go('preview')
   }
   const [badges, setBadges] = useState(loadBadges)
+  const [trips, setTrips] = useState(() => loadTrips())
+  // The trip open in "Your trips", and the story open from it.
+  const [tripId, setTripId] = useState<string | null>(null)
+  const [storyIndex, setStoryIndex] = useState(0)
   const [atHome, setAtHome] = useState(true)
   const [pause, setPause] = useState<'menu' | 'report' | null>(null)
   const [reason, setReason] = useState<string | null>(null)
@@ -203,30 +211,68 @@ export default function App() {
           }}
         />
       )
-    } else if (view === 'home' && tab === 'you') {
+    } else if (view === 'home' && tab === 'trips') {
+      const played = new Set(trips.map((t) => cityKey(routeById(t.routeId).city)))
       screen = (
-        <You
-          routes={routes}
-          badges={badges}
+        <Trips
+          trips={trips}
           name={name}
+          nextCity={cities.find((c) => !played.has(c.key))}
+          onOpenTrip={(t) => {
+            setTripId(t.id)
+            go('trip')
+          }}
+          onExplore={(c) => {
+            if (c) pickCity(c.key)
+            setTab('explore')
+          }}
           onName={(n) => {
             saveName(n)
             setName(n)
-          }}
-          onOpen={(r) => {
-            pickCity(cityKey(r.city))
-            openRoute(r)
           }}
           onAddRoute={() => setAdding(true)}
           onJoinTeam={() => setTeamView('join')}
           onReset={() => {
             save('cq.badges', null)
+            clearTrips()
             setBadges([])
+            setTrips([])
             update(null)
-            flash('Progress reset.')
+            flash('Trips deleted.')
           }}
         />
       )
+    } else if ((view === 'trip' || view === 'story') && trips.some((t) => t.id === tripId) && findRoute(trips.find((t) => t.id === tripId)!.routeId)) {
+      const trip = trips.find((t) => t.id === tripId)!
+      const tr = findRoute(trip.routeId)!
+      const st = tr.stops[storyIndex]
+      screen =
+        view === 'story' && st ? (
+          <Lesson
+            lang={tr.language}
+            localLanguage={tr.localLanguage}
+            key={st.id}
+            stop={st}
+            index={storyIndex}
+            total={tr.stops.length}
+            spotted={[]}
+            onCheck={() => {}}
+            onSpot={() => {}}
+            actionLabel="Back to your trip"
+            onAction={back}
+            onBack={back}
+          />
+        ) : (
+          <TripView
+            trip={trip}
+            route={tr}
+            onBack={back}
+            onStory={(i) => {
+              setStoryIndex(i)
+              go('story')
+            }}
+          />
+        )
     } else if (view === 'cities') {
       screen = (
         <CityPicker
@@ -241,14 +287,12 @@ export default function App() {
           onAddRoute={() => setAdding(true)}
         />
       )
-    } else if (view === 'routes') {
-      screen = <CityRoutes city={city} badges={badges} session={session} onOpen={openRoute} onBack={back} />
     } else if (view === 'preview') {
       screen = (
         <RoutePreview
           key={picked.id}
           route={picked}
-          badges={badges}
+          lastTrip={trips.find((t) => t.routeId === picked.id)}
           session={session}
           team={teamCode}
           onBack={back}
@@ -268,15 +312,11 @@ export default function App() {
           badges={badges}
           session={session}
           playingRoute={session ? findRoute(session.routeId) : undefined}
-          focusId={picked.id}
           team={teamCode}
           onCities={() => go('cities')}
-          onSeeAll={() => go('routes')}
           onOpen={openRoute}
           onResume={() => setAtHome(false)}
           onTeam={() => setTeamView('play')}
-          name={name}
-          onYou={() => setTab('you')}
         />
       )
     }
@@ -393,11 +433,12 @@ export default function App() {
         spotted={spottedFor(stop.id)}
         onCheck={(o) => answerCheck(stop.id, o)}
         onSpot={(i) => toggleSpot(stop.id, i)}
-        actionLabel={isLast ? 'See my badge' : 'Next riddle'}
+        actionLabel={isLast ? 'See my souvenir' : 'Next riddle'}
         onAction={() => {
           if (!isLast) return update({ ...s, screen: 'walk', index: s.index + 1, wrongs: 0, hinted: false })
-          const finishedAt = Date.now()
+          const finishedAt = now()
           setBadges(awardBadge({ routeId: route.id, mode: 'solo', stars: starsFor(points, total), points, date: new Date(finishedAt).toISOString() }))
+          setTrips(addTrip(soloTrip(route, { ...s, finishedAt }, points, name)))
           update({ ...s, screen: 'end', finishedAt })
         }}
       />
@@ -416,7 +457,7 @@ export default function App() {
         spotted={spottedFor(rs.id)}
         onCheck={(o) => answerCheck(rs.id, o)}
         onSpot={(i) => toggleSpot(rs.id, i)}
-        actionLabel="Back to my badge"
+        actionLabel="Back to my souvenir"
         onAction={() => setReview(null)}
         onBack={() => setReview(null)}
       />
@@ -424,6 +465,7 @@ export default function App() {
   } else {
     screen = (
       <End
+        trip={soloTrip(route, s, points, name)}
         route={route}
         session={s}
         points={points}
@@ -446,3 +488,9 @@ export default function App() {
   )
 }
 
+
+/** A finished solo hunt, as a trip for the souvenir and Your trips. */
+function soloTrip(route: Route, s: Session, points: number, name: string): Trip {
+  const date = new Date(s.finishedAt ?? s.startedAt).toISOString()
+  return { id: `${route.id}-${date}`, routeId: route.id, date, mode: 'solo', names: name ? [name] : [], points, stars: starsFor(points, route.stops.length), ms: s.finishedAt ? s.finishedAt - s.startedAt : undefined }
+}

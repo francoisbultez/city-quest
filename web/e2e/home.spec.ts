@@ -11,12 +11,13 @@ test('first launch explains the app, then finds the nearest city', async ({ page
   await expect(page.getByText('Follow a riddle on the map')).toBeVisible()
   await expect(page.getByText('Free · no account · works offline')).toBeVisible()
   await page.getByRole('button', { name: 'Find a hunt near me' }).click()
-  await expect(page.getByRole('heading', { name: 'Treasure hunts through Toledo' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Change city, now Toledo' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What shall we explore today?' })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible()
 
   // Shown only once.
   await page.reload()
-  await expect(page.getByRole('heading', { name: 'Treasure hunts through Toledo' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Change city, now Toledo' })).toBeVisible()
 })
 
 test('first launch: choose a city instead', async ({ page, context }) => {
@@ -25,35 +26,48 @@ test('first launch: choose a city instead', async ({ page, context }) => {
   await page.getByRole('button', { name: 'Choose a city instead' }).click()
   await expect(page.getByRole('heading', { name: 'Where are you playing?' })).toBeVisible()
   await page.getByRole('button', { name: /^Madrid/ }).click()
-  await expect(page.getByRole('heading', { name: 'Treasure hunts through Madrid' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Change city, now Madrid' })).toBeVisible()
 })
 
-test('You: name, stats, badges and reset', async ({ page }) => {
+test('Your trips: a souvenir and the stories, kept on the phone', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('cq.welcomed', 'true'))
   await page.addInitScript(
     ([id]) => {
-      if (!localStorage.getItem('cq.badges')) localStorage.setItem('cq.badges', JSON.stringify([{ routeId: id, mode: 'solo', stars: 3, points: 750, date: '2026-11-20T10:00:00Z' }]))
+      // A phone from before trips existed: its badge becomes a trip.
+      if (!localStorage.getItem('cq.badges')) localStorage.setItem('cq.badges', JSON.stringify([{ routeId: id, mode: 'solo', stars: 3, points: 750, date: '2026-11-21T17:00:00Z' }]))
     },
     [sol.id],
   )
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
-  await page.getByRole('button', { name: 'You', exact: true }).first().click()
+  await expect(page.getByRole('button', { name: /^The Sol Route:/ }).getByText('Played')).toBeVisible()
 
-  await expect(page.getByRole('heading', { name: 'Explorer' })).toBeVisible()
-  await expect(page.getByText(`${sol.stops.length}`, { exact: true })).toBeVisible() // places found
-  await expect(page.getByRole('button', { name: `Madrid · The Sol Route: 3 of 3 stars` })).toBeVisible()
-  await expect(page.getByRole('button', { name: /Toledo · The Three Cultures Route: not earned yet/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Your trips' }).click()
+  await expect(page.getByRole('heading', { name: 'Your trips' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Going somewhere next\? City Quest also has Toledo/ })).toBeVisible()
+  await page.getByRole('button', { name: /^Madrid · The Sol Route, Sat,? 21 Nov 2026/ }).click()
 
-  await page.getByRole('button', { name: 'Add name' }).click()
+  await expect(page.getByRole('heading', { name: 'Madrid · The Sol Route' })).toBeVisible()
+  await page.getByRole('button', { name: /Your souvenir/ }).click()
+  await expect(page.getByRole('figure', { name: /^Souvenir: Madrid, The Sol Route/ })).toBeVisible()
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Save image' }).click()
+  const file = await download
+  expect(file.suggestedFilename()).toBe('city-quest-madrid-sol-2026-11-21.png')
+  expect((await import('node:fs')).statSync((await file.path())!).size).toBeGreaterThan(50_000)
+  await page.getByRole('button', { name: new RegExp(sol.stops[1].lesson.title) }).click()
+  await expect(page.getByRole('heading', { level: 1, name: sol.stops[1].lesson.title })).toBeVisible()
+  await page.getByRole('button', { name: 'Back to your trip' }).click()
+  await page.goBack()
+  await expect(page.getByRole('heading', { name: 'Your trips' })).toBeVisible()
+
+  // Settings: the name goes on souvenirs; deleting empties the list.
+  await page.getByRole('button', { name: 'Settings' }).click()
+  await page.getByRole('button', { name: /Name your team sees/ }).click()
   await page.getByLabel('Name', { exact: true }).fill('Ana')
   await page.getByRole('button', { name: 'Save' }).click()
-  await expect(page.getByRole('heading', { name: 'Ana' })).toBeVisible()
-  await page.getByRole('button', { name: 'Explore' }).click()
-  await expect(page.getByRole('heading', { name: 'Hola, Ana' })).toBeVisible()
-
-  await page.getByRole('button', { name: 'You: Ana' }).click()
-  await page.getByRole('button', { name: 'Reset my progress' }).click()
-  await page.getByRole('button', { name: 'Reset everything' }).click()
-  await expect(page.getByRole('button', { name: /The Sol Route: not earned yet/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Settings' }).click()
+  await expect(page.getByRole('button', { name: /Name your team sees\s*Ana/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Delete my trips and progress' }).click()
+  await page.getByRole('button', { name: 'Delete everything' }).click()
+  await expect(page.getByText('No trips yet')).toBeVisible()
 })

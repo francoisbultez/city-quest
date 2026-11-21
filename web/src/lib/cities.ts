@@ -65,3 +65,12 @@ export function routeStatus(route: Route, badges: EarnedBadge[], session: Sessio
 
 /** "The Sol Route" → "the Sol Route", for sentences like "Start the Sol Route". */
 export const inSentence = (name: string) => name.replace(/^The /, 'the ')
+
+/** Minutes from a duration label like "~2 h", "1.5 h", "90 min" or "1 h 30". Unknown → undefined. */
+export function durationMinutes(label: string): number | undefined {
+  const s = label.toLowerCase().replace(',', '.')
+  const h = s.match(/(\d+(?:\.\d+)?)\s*h/)
+  const m = s.match(/(\d+)\s*(?:min|m\b)/) ?? s.match(/h\s*(\d+)/)
+  if (!h && !m) return undefined
+  return Math.round((h ? parseFloat(h[1]) * 60 : 0) + (m ? parseInt(m[1], 10) : 0))
+}

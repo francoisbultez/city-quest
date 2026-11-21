@@ -26,6 +26,25 @@
   "author": {
     "name": "City Quest"
   },
+  "startTransit": "Metro Sol, right outside",
+  "ends": {
+    "name": "Templo de Debod",
+    "transit": "A short walk from Metro Plaza de España"
+  },
+  "bestTime": {
+    "title": "Best late afternoon",
+    "text": "You finish at the Templo de Debod, a favourite sunset spot"
+  },
+  "terrain": {
+    "title": "Mostly flat",
+    "text": "Steep steps at the Arco de Cuchilleros"
+  },
+  "goodFor": [
+    "first-visit",
+    "sunset",
+    "kids"
+  ],
+  "highlight": "Great first walk",
   "stops": [
     {
       "id": "km0",

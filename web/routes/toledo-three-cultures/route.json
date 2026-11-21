@@ -26,6 +26,21 @@
   "author": {
     "name": "City Quest"
   },
+  "ends": {
+    "name": "Puente de San Martín"
+  },
+  "bestTime": {
+    "title": "Start early in summer",
+    "text": "Toledo gets very hot in July and August"
+  },
+  "terrain": {
+    "title": "Hilly and cobbled",
+    "text": "Walk it in this order: it is mostly downhill to the river"
+  },
+  "goodFor": [
+    "first-visit"
+  ],
+  "highlight": "Downhill through the old town",
   "stops": [
     {
       "id": "bisagra",

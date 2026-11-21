@@ -111,6 +111,18 @@ export const RouteSchema = z
     start: text(1, 80),
     /** Rough time to play, e.g. "~2 h". */
     duration: text(1, 20),
+    /** Nearest public transport to the start, e.g. "Metro Sol, right outside". */
+    startTransit: text(1, 80).optional(),
+    /** Where the walk finishes, and the nearest transport there. */
+    ends: z.object({ name: text(1, 80), transit: text(1, 80).optional() }).optional(),
+    /** When to go, e.g. { title: "Best late afternoon", text: "You finish at a sunset spot" }. */
+    bestTime: z.object({ title: text(1, 40), text: text(1, 120).optional() }).optional(),
+    /** Slopes, steps, cobbles: { title: "Mostly flat", text: "Steep steps at the arch" }. */
+    terrain: z.object({ title: text(1, 40), text: text(1, 120).optional() }).optional(),
+    /** Who or when it suits; drives the filters on the home screen. */
+    goodFor: z.array(z.enum(['kids', 'sunset', 'first-visit', 'off-the-beaten-track'])).optional(),
+    /** One short line on the route card, e.g. "Great first walk". */
+    highlight: text(1, 32).optional(),
     /** Photo for route cards and the preview. Defaults to the first stop's photo. */
     cover: ImageSchema.optional(),
     /** Badge and celebration colours. */
