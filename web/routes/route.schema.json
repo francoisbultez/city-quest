@@ -29,6 +29,16 @@
       "minLength": 2,
       "maxLength": 2
     },
+    "region": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "kind": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 24
+    },
     "name": {
       "type": "string",
       "minLength": 1,

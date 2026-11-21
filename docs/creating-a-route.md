@@ -17,6 +17,12 @@ web/routes/lisbon-alfama/
 - **Remove a route:** delete its folder.
 - **Share a route without changing the app:** put `route.json` (and its `images/`) anywhere on the web over https, and open the app as `…/city-quest/?route=https://your.site/lisbon-alfama/route.json`. The app downloads it, checks it, and keeps it on that phone. Image paths are read relative to the `route.json` link. A team in Together mode downloads it automatically too.
 
+## Cities come from routes
+
+There is no list of cities in the code. Every route names its `city`; routes with the same city are grouped together, and the city's position (for "Near you" and distances) is the average of its routes' starting points. Add the first route for Lisbon and Lisbon appears in the city list.
+
+Cities that are on the way are listed in `web/routes/coming-soon.json`. A city disappears from "Coming soon" as soon as it has a route.
+
 ## Start a new route
 
 From `web/`:
@@ -52,7 +58,9 @@ The full, always-current definition is `web/src/engine/schema.ts`, exported as `
 | `language` | no | What the route is written in (default `en`); sets the read-aloud voice |
 | `localLanguage` | no | `{ "code": "pt", "name": "Portuguese" }`, which titles the words section |
 | `theme` | no | `{ "colors": ["#006600", "#ffcc00"] }`, the badge's outer and band colours, also used for the confetti |
-| `country`, `author` | no | `"PT"`, `{ "name": "…", "url": "https://…" }` |
+| `region` | no | Shown in the city list, e.g. `"Castilla-La Mancha"` |
+| `kind` | no | Short label on the route card, e.g. `"Classic"` or `"Neighbourhood"`. With 4 or more routes in a city, the list can be filtered by it |
+| `country`, `author` | no | `"PT"`, `{ "name": "…", "url": "https://…" }`. An author other than City Quest is credited on the route preview |
 
 ### A stop
 

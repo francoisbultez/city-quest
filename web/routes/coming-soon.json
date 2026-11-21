@@ -1,0 +1,61 @@
+{
+  "$schema": "./coming-soon.schema.json",
+  "cities": [
+    {
+      "city": "Barcelona",
+      "region": "Catalonia"
+    },
+    {
+      "city": "Bilbao",
+      "region": "Basque Country"
+    },
+    {
+      "city": "Cádiz",
+      "region": "Andalusia"
+    },
+    {
+      "city": "Córdoba",
+      "region": "Andalusia"
+    },
+    {
+      "city": "Granada",
+      "region": "Andalusia"
+    },
+    {
+      "city": "Málaga",
+      "region": "Andalusia"
+    },
+    {
+      "city": "Palma",
+      "region": "Balearic Islands"
+    },
+    {
+      "city": "Salamanca",
+      "region": "Castile and León"
+    },
+    {
+      "city": "San Sebastián",
+      "region": "Basque Country"
+    },
+    {
+      "city": "Santiago de Compostela",
+      "region": "Galicia"
+    },
+    {
+      "city": "Segovia",
+      "region": "Castile and León"
+    },
+    {
+      "city": "Sevilla",
+      "region": "Andalusia"
+    },
+    {
+      "city": "Valencia",
+      "region": "Valencian Community"
+    },
+    {
+      "city": "Zaragoza",
+      "region": "Aragon"
+    }
+  ]
+}

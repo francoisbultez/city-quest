@@ -1,6 +1,10 @@
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { End } from './components/End'
-import { Home } from './components/Home'
+import { AddRoute } from './components/browse/AddRoute'
+import { CityPicker } from './components/browse/CityPicker'
+import { CityRoutes } from './components/browse/CityRoutes'
+import { Home } from './components/browse/Home'
+import { RoutePreview } from './components/browse/RoutePreview'
 import { Lesson } from './components/Lesson'
 import { Modal } from './components/Modal'
 import { Quiz } from './components/Quiz'
@@ -8,11 +12,16 @@ import { Walk } from './components/Walk'
 import { Team } from './components/team/Team'
 import { TeamJoin } from './components/team/TeamJoin'
 import { addRouteFromUrl, findRoute, getRoutes, RouteError, routeById, subscribeRoutes } from './engine/registry'
+import { cityKey, citiesFrom, nearestCity } from './lib/cities'
 import { currentStreak, isPerfect, starsFor, stopPoints } from './lib/game'
 import { awardBadge, loadBadges, loadSession, newSession, saveSession, sessionPoints, type Session } from './lib/session'
 import { load, reportClue, save } from './lib/storage'
 import { loadName, loadTeam, openRoom, saveTeam } from './lib/team/room'
 import type { Room } from './lib/team/types'
+import { useApproxPosition } from './lib/useApproxPosition'
+import type { Route } from './types'
+
+type View = 'home' | 'cities' | 'routes' | 'preview'
 
 const REASONS = ['Can’t find it', 'Answer looks wrong', 'Covered or closed', 'Other']
 
@@ -23,10 +32,49 @@ export default function App() {
     const s = loadSession()
     return s && findRoute(s.routeId) ? s : null
   })
-  // Route shown on the home screen; a solo game always plays its own route.
+  // The route last opened; a solo game always plays its own route.
   const [pickedId, setPickedId] = useState(() => load<string | null>('cq.route', null) ?? session?.routeId ?? routes[0].id)
   const picked = routeById(pickedId)
   const route = session ? routeById(session.routeId) : picked
+
+  // Cities come from the routes: a new route folder adds its city.
+  const cities = useMemo(() => citiesFrom(routes), [routes])
+  const [cityChoice, setCityChoice] = useState<string | null>(() => load<string | null>('cq.city', null))
+  const geo = useApproxPosition()
+  const autoCity = nearestCity(cities, geo.pos)?.key ?? cityKey(picked.city)
+  const city = cities.find((c) => c.key === (cityChoice ?? autoCity)) ?? cities[0]
+  const [view, setView] = useState<View>('home')
+  const [adding, setAdding] = useState(false)
+
+  // The phone's back button walks back through these screens.
+  const trail = useRef<View[]>([])
+  const go = (v: View) => {
+    trail.current.push(v)
+    window.history.pushState({ cq: true }, '')
+    setView(v)
+  }
+  const back = () => window.history.back()
+  const goHome = () => {
+    trail.current = []
+    setView('home')
+  }
+  useEffect(() => {
+    const onPop = () => {
+      trail.current.pop()
+      setView(trail.current.at(-1) ?? 'home')
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+  const pickCity = (key: string) => {
+    setCityChoice(key)
+    save('cq.city', key)
+  }
+  const openRoute = (r: Route) => {
+    setPickedId(r.id)
+    save('cq.route', r.id)
+    go('preview')
+  }
   const [badges, setBadges] = useState(loadBadges)
   const [atHome, setAtHome] = useState(true)
   const [pause, setPause] = useState<'menu' | 'report' | null>(null)
@@ -38,7 +86,6 @@ export default function App() {
   const [teamView, setTeamView] = useState<'join' | 'play' | null>(() => (inviteCode ? 'join' : null))
   const [teamCode, setTeamCode] = useState(() => loadTeam()?.code ?? null)
   const [room, setRoom] = useState<Room | null>(null)
-  const [homeMode, setHomeMode] = useState<'solo' | 'team'>(inviteCode || loadTeam() ? 'team' : 'solo')
 
   // Reconnect to the team after a reload.
   useEffect(() => {
@@ -69,6 +116,7 @@ export default function App() {
       .then((r) => {
         setPickedId(r.id)
         save('cq.route', r.id)
+        pickCity(cityKey(r.city))
         flash(`Added “${r.city} · ${r.name}”`)
       })
       .catch((e) => flash(e instanceof RouteError ? [e.message, ...e.details.slice(0, 2)].join(' ') : 'Couldn’t add that route.'))
@@ -111,7 +159,6 @@ export default function App() {
             room.close()
             setRoom(null)
           }
-          setHomeMode('team')
           setTeamView(null)
         }}
       />
@@ -119,28 +166,76 @@ export default function App() {
   }
 
   if (atHome || !session) {
+    let screen
+    if (view === 'cities') {
+      screen = (
+        <CityPicker
+          cities={cities}
+          current={city}
+          badges={badges}
+          onClose={back}
+          onPick={(c) => {
+            pickCity(c.key)
+            back()
+          }}
+          onAddRoute={() => setAdding(true)}
+        />
+      )
+    } else if (view === 'routes') {
+      screen = <CityRoutes city={city} badges={badges} session={session} onOpen={openRoute} onBack={back} />
+    } else if (view === 'preview') {
+      screen = (
+        <RoutePreview
+          key={picked.id}
+          route={picked}
+          badges={badges}
+          session={session}
+          team={teamCode}
+          onBack={back}
+          onStart={() => {
+            update(newSession(picked.id))
+            setAtHome(false)
+          }}
+          onResume={() => setAtHome(false)}
+          onTogether={() => setTeamView(teamCode ? 'play' : 'join')}
+        />
+      )
+    } else {
+      screen = (
+        <Home
+          key={city.key}
+          city={city}
+          badges={badges}
+          session={session}
+          playingRoute={session ? findRoute(session.routeId) : undefined}
+          focusId={picked.id}
+          team={teamCode}
+          onCities={() => go('cities')}
+          onSeeAll={() => go('routes')}
+          onOpen={openRoute}
+          onResume={() => setAtHome(false)}
+          onTeam={() => setTeamView('play')}
+          onJoinTeam={() => setTeamView('join')}
+        />
+      )
+    }
     return (
       <>
-      <Home
-        key={homeMode}
-        initialMode={homeMode}
-        team={teamCode}
-        onTogether={() => setTeamView(teamCode ? 'play' : 'join')}
-        route={picked}
-        routes={routes}
-        onPickRoute={(id) => {
-          setPickedId(id)
-          save('cq.route', id)
-        }}
-        badges={badges}
-        session={session}
-        onStart={() => {
-          update(newSession(picked.id))
-          setAtHome(false)
-        }}
-        onResume={() => setAtHome(false)}
-      />
-      {toast && <div className="toast" role="status">{toast}</div>}
+        {screen}
+        {adding && (
+          <AddRoute
+            onClose={() => setAdding(false)}
+            onAdded={(r) => {
+              setAdding(false)
+              pickCity(cityKey(r.city))
+              flash(`Added “${r.city} · ${r.name}”`)
+              setPickedId(r.id)
+              save('cq.route', r.id)
+              go('preview')
+            }}
+          />
+        )}
+        {toast && <div className="toast" role="status">{toast}</div>}
       </>
     )
   }
@@ -163,6 +258,7 @@ export default function App() {
     setPause(null)
     update(null)
     setAtHome(true)
+    goHome()
   }
 
   const sheet = pause && (
@@ -273,6 +369,7 @@ export default function App() {
         onHome={() => {
           update(null)
           setAtHome(true)
+          goHome()
         }}
       />
     )

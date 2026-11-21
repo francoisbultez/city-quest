@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { routeFile } from './routes'
+import { openRoute, routeFile } from './routes'
 
 const solRoute = routeFile('madrid-sol')
 import type { Stop } from '../src/types'
@@ -19,7 +19,8 @@ function trackErrors(page: Page) {
 /** Ana starts a team; Tom joins with the invite link. Both phones share one browser (local stand-in). */
 async function makeTeam(ana: Page, tom: Page) {
   await ana.goto('/')
-  await ana.getByRole('button', { name: /Together/ }).click()
+  await openRoute(ana, solRoute)
+  await ana.getByRole('button', { name: /^Together/ }).click()
   await ana.getByRole('button', { name: 'Start or join a team' }).click()
   await ana.getByLabel('Your name').fill('Ana')
   await ana.getByRole('button', { name: 'Start a new team' }).click()
@@ -107,7 +108,7 @@ test('a reload takes you back to your team', async ({ context }) => {
   await expect(tom.getByText(stops[0].riddle, { exact: false })).toBeVisible()
 
   await tom.reload()
-  await tom.getByRole('button', { name: `Back to your team · ${code}` }).click()
+  await tom.getByRole('button', { name: new RegExp(`Back to your team · ${code}`) }).click()
   await expect(tom.getByText(stops[0].riddle, { exact: false })).toBeVisible()
 })
 
@@ -123,7 +124,8 @@ test('wrong codes and leaving the team', async ({ context }) => {
   await expect(eve.getByRole('alert')).toHaveText('No team with the code ZZZZ. Check it with your friends.')
 
   await tom.getByRole('button', { name: 'Leave' }).click()
-  await expect(tom.getByRole('button', { name: 'Start or join a team' })).toBeVisible()
+  await expect(tom.getByRole('heading', { name: '2 routes in Madrid' })).toBeVisible()
+  await expect(tom.getByRole('button', { name: /Back to your team/ })).toHaveCount(0)
   await expect(ana.getByText('Tom', { exact: true })).toHaveCount(0)
   await expect(ana.getByRole('button', { name: 'Start without waiting' })).toBeVisible()
 })

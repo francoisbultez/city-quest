@@ -1,5 +1,5 @@
 import { load, save } from '../lib/storage'
-import { parseRoute, type Route } from './schema'
+import { ComingSoonSchema, parseRoute, type Route } from './schema'
 
 /**
  * Where routes come from.
@@ -25,6 +25,19 @@ interface AddedRoute {
 // Vite bundles these at build time, so built-in routes work offline.
 const builtInFiles = import.meta.glob<unknown>('/routes/*/route.json', { eager: true, import: 'default' })
 const builtInImages = import.meta.glob<string>('/routes/*/images/*', { eager: true, query: '?url', import: 'default' })
+const comingSoonFile = import.meta.glob<unknown>('/routes/coming-soon.json', { eager: true, import: 'default' })
+
+/** Cities announced in routes/coming-soon.json (optional file). */
+export const comingSoon = (() => {
+  const data = Object.values(comingSoonFile)[0]
+  if (data === undefined) return []
+  const res = ComingSoonSchema.safeParse(data)
+  if (!res.success) {
+    console.warn('routes/coming-soon.json is not valid and was skipped', res.error.issues)
+    return []
+  }
+  return res.data.cities
+})()
 
 /** Gives every image a URL the browser can load. */
 function resolveImages(route: Route, resolve: (src: string) => string | undefined): Route {

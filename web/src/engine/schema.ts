@@ -99,6 +99,10 @@ export const RouteSchema = z
     city: text(1, 60),
     /** ISO 3166-1 alpha-2 country code, e.g. "ES". */
     country: z.string().length(2).optional(),
+    /** Region shown in the city list, e.g. "Castilla-La Mancha". */
+    region: text(1, 60).optional(),
+    /** Short type label shown on the route card, e.g. "Classic" or "Neighbourhood". */
+    kind: text(1, 24).optional(),
     name: text(1, 60),
     /** Printed on the badge, keep it short (e.g. "THE SOL ROUTE"). */
     badgeLine: text(1, 22),
@@ -127,6 +131,13 @@ export type Stop = z.infer<typeof StopSchema>
 export type Place = z.infer<typeof PlaceSchema>
 export type Lesson = z.infer<typeof LessonSchema>
 export type LessonImage = z.infer<typeof ImageSchema>
+
+/** Cities that are on the way, listed in routes/coming-soon.json. */
+export const ComingSoonSchema = z.object({
+  $schema: z.string().optional(),
+  cities: z.array(z.object({ city: text(1, 60), region: text(1, 60).optional() })),
+})
+export type ComingSoon = z.infer<typeof ComingSoonSchema>
 
 export type RouteResult = { ok: true; route: Route } | { ok: false; errors: string[] }
 

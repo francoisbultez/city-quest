@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { routeFile } from './routes'
+import { openRoute, routeFile } from './routes'
 
 const solRoute = routeFile('madrid-sol')
 import type { Stop } from '../src/types'
@@ -21,6 +21,7 @@ function trackErrors(page: Page) {
 
 async function start(page: Page) {
   await page.goto('/')
+  await openRoute(page, solRoute)
   await page.getByRole('button', { name: /^Start at the/ }).click()
 }
 
@@ -38,9 +39,12 @@ test.beforeEach(async ({ context }) => {
 test('plays the whole Sol Route solo and unlocks the badge', async ({ page }) => {
   const errors = trackErrors(page)
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Madrid · The Sol Route' })).toBeVisible()
-  await expect(page.getByText('Earn this badge')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Change city, now Madrid' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '2 routes in Madrid' })).toBeVisible()
+  await expect(page.getByText('Not played yet').first()).toBeVisible()
   await expect(page.getByText('0 badges')).toBeVisible()
+  await openRoute(page, solRoute)
+  await expect(page.getByText('8', { exact: true })).toBeVisible() // secret stops
   await page.getByRole('button', { name: 'Start at the Puerta del Sol' }).click()
 
   for (const [i, s] of stops.entries()) {
@@ -111,8 +115,13 @@ test('plays the whole Sol Route solo and unlocks the badge', async ({ page }) =>
 
   await page.getByRole('button', { name: 'Back to start' }).click()
   await expect(page.getByText('1 badge')).toBeVisible()
-  await expect(page.getByText('Your badge')).toBeVisible()
-  await expect(page.getByText('Best score: 750 points')).toBeVisible()
+  await expect(page.getByText('Your best: 750 points')).toBeVisible()
+  await expect(page.getByText('1 of 2 badges earned here')).toBeVisible()
+  // The preview remembers it too, and the phone's back button returns home.
+  await openRoute(page, solRoute)
+  await expect(page.getByText("Your best: 3 stars, 750 points.", { exact: false })).toBeVisible()
+  await page.goBack()
+  await expect(page.getByRole('heading', { name: '2 routes in Madrid' })).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -156,7 +165,7 @@ test('progress survives closing the app', async ({ page }) => {
   await expect(page.getByTestId('score')).toHaveText('100')
 
   await page.reload()
-  await page.getByRole('button', { name: 'Continue · stop 2 of 8' }).click()
+  await page.getByRole('button', { name: /Continue the Sol Route.*stop 2 of 8/ }).click()
   await expect(page.getByText('2 / 8')).toBeVisible()
   await expect(page.getByTestId('score')).toHaveText('100')
 })
@@ -176,17 +185,19 @@ test('pause menu: report a problem, then leave the route', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Pause' }).click()
   await page.getByRole('button', { name: 'Leave the route' }).click()
-  await expect(page.getByRole('button', { name: 'Start at the Puerta del Sol' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '2 routes in Madrid' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Continue/ })).toHaveCount(0)
 })
 
 
 test('test mode lets you teleport to each stop', async ({ page, context }) => {
   await context.setGeolocation(FAR_AWAY)
   await page.goto('/')
+  await openRoute(page, solRoute)
   await page.getByRole('button', { name: /^Start at the/ }).click()
   await expect(page.getByRole('button', { name: /Teleport/ })).toHaveCount(0) // off by default
   await page.goto('/?test')
-  await page.getByRole('button', { name: 'Continue · stop 1 of 8' }).click()
+  await page.getByRole('button', { name: /Continue the Sol Route.*stop 1 of 8/ }).click()
   await page.getByRole('button', { name: /Teleport to this stop/ }).click()
   await expect(page.getByText('You found it!')).toBeVisible()
   await page.goto('/?test=off')
@@ -202,7 +213,8 @@ test('keeps working offline once loaded', async ({ page, context }) => {
 
   await context.setOffline(true)
   await page.reload()
-  await expect(page.getByRole('heading', { name: 'Madrid · The Sol Route' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '2 routes in Madrid' })).toBeVisible()
+  await openRoute(page, solRoute)
   await page.getByRole('button', { name: /^Start at the/ }).click()
   await page.getByRole('button', { name: 'Open the quiz' }).click()
   await expect(page.getByRole('heading', { name: stops[0].question })).toBeVisible()

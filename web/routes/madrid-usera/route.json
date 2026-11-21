@@ -9,6 +9,8 @@
   },
   "city": "Madrid",
   "country": "ES",
+  "region": "Community of Madrid",
+  "kind": "Neighbourhood",
   "name": "The Usera Route",
   "badgeLine": "THE USERA ROUTE",
   "tagline": "7 riddles from Metro Usera to the “broken church” in Pradolongo",

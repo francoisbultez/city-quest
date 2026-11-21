@@ -9,6 +9,8 @@
   },
   "city": "Madrid",
   "country": "ES",
+  "region": "Community of Madrid",
+  "kind": "Classic",
   "name": "The Sol Route",
   "badgeLine": "THE SOL ROUTE",
   "tagline": "8 riddles from the Puerta del Sol to the Templo de Debod",
