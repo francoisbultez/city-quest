@@ -111,6 +111,8 @@ export const RouteSchema = z
     start: text(1, 80),
     /** Rough time to play, e.g. "~2 h". */
     duration: text(1, 20),
+    /** Photo for route cards and the preview. Defaults to the first stop's photo. */
+    cover: ImageSchema.optional(),
     /** Badge and celebration colours. */
     theme: z.object({ colors: z.tuple([color, color]), ink: color.optional() }).optional(),
     /** The local language, for the "words" section, e.g. { code: "es", name: "Spanish" }. */

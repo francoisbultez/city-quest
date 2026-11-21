@@ -64,6 +64,69 @@
       "minLength": 1,
       "maxLength": 20
     },
+    "cover": {
+      "type": "object",
+      "properties": {
+        "src": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 300
+        },
+        "position": {
+          "type": "string"
+        },
+        "credit": {
+          "type": "object",
+          "properties": {
+            "artist": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "license": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "licenseUrl": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uri"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "page": {
+              "type": "string",
+              "format": "uri"
+            },
+            "site": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          },
+          "required": [
+            "artist",
+            "license",
+            "page"
+          ]
+        }
+      },
+      "required": [
+        "src",
+        "alt",
+        "credit"
+      ]
+    },
     "theme": {
       "type": "object",
       "properties": {

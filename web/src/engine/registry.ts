@@ -41,8 +41,10 @@ export const comingSoon = (() => {
 
 /** Gives every image a URL the browser can load. */
 function resolveImages(route: Route, resolve: (src: string) => string | undefined): Route {
+  const cover = route.cover && (/^https:\/\//.test(route.cover.src) ? route.cover.src : resolve(route.cover.src))
   return {
     ...route,
+    cover: route.cover && cover ? { ...route.cover, src: cover } : undefined,
     stops: route.stops.map((s) => {
       const img = s.lesson.image
       if (!img) return s
@@ -163,3 +165,6 @@ export function removeAddedRoute(id: string) {
   added = loadAdded()
   changed()
 }
+
+/** The photo that represents a route: its cover, else the first stop with a photo. */
+export const coverOf = (route: Route) => route.cover ?? route.stops.find((s) => s.lesson.image)?.lesson.image

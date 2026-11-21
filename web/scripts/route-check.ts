@@ -33,6 +33,7 @@ for (const dir of folders) {
   else {
     const r = res.route
     if (r.id !== name) errors.push(`id "${r.id}" must match the folder name "${name}"`)
+    if (r.cover && !/^https:\/\//.test(r.cover.src) && !existsSync(join(dir, r.cover.src))) errors.push(`cover.src: file "${r.cover.src}" not found in the route folder`)
     r.stops.forEach((s, i) => {
       const img = s.lesson.image
       if (img && !/^https:\/\//.test(img.src) && !existsSync(join(dir, img.src))) errors.push(`stops.${i}.lesson.image.src: file "${img.src}" not found in the route folder`)

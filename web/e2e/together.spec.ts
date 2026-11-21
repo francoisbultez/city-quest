@@ -124,7 +124,7 @@ test('wrong codes and leaving the team', async ({ context }) => {
   await expect(eve.getByRole('alert')).toHaveText('No team with the code ZZZZ. Check it with your friends.')
 
   await tom.getByRole('button', { name: 'Leave' }).click()
-  await expect(tom.getByRole('heading', { name: '2 routes in Madrid' })).toBeVisible()
+  await expect(tom.getByRole('heading', { name: 'Explore Madrid' })).toBeVisible()
   await expect(tom.getByRole('button', { name: /Back to your team/ })).toHaveCount(0)
   await expect(ana.getByText('Tom', { exact: true })).toHaveCount(0)
   await expect(ana.getByRole('button', { name: 'Start without waiting' })).toBeVisible()

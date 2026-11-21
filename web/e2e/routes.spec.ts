@@ -13,7 +13,7 @@ for (const id of builtInIds()) {
     await context.setGeolocation(at(route.stops[0]))
     await page.goto('/')
     await openRoute(page, route)
-    await expect(page.getByText(route.duration, { exact: true })).toBeVisible()
+    await expect(page.getByText(route.duration.replace(/^~/, ''), { exact: true })).toBeVisible()
     await page.getByRole('button', { name: `Start at ${route.start}` }).click()
 
     for (const [i, s] of route.stops.entries()) {
@@ -32,7 +32,7 @@ for (const id of builtInIds()) {
     // The choice is remembered and the route now shows its badge.
     await page.getByRole('button', { name: 'Back to start' }).click()
     await expect(page.getByRole('button', { name: `Change city, now ${route.city}` })).toBeVisible()
-    await expect(page.getByRole('button', { name: new RegExp(`^${route.name}:`) }).getByText(/Your best: \d+ points/)).toBeVisible()
+    await expect(page.getByRole('button', { name: new RegExp(`^${route.name}:`) }).getByText(/Best \d+ pts/)).toBeVisible()
     expect(errors).toEqual([])
   })
 }
@@ -85,7 +85,7 @@ test('add a route someone else made, from a link', async ({ page, context }) => 
   await page.goto(`/?route=${encodeURIComponent(LINK)}`)
   await expect(page.getByRole('status')).toHaveText('Added “Lisboa · The Tiny Tram Route”')
   await expect(page).toHaveURL(/\/$/)
-  await expect(page.getByRole('heading', { name: '1 route in Lisboa' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Explore Lisboa' })).toBeVisible()
   await openRoute(page, tinyRoute)
   await expect(page.getByRole('img', { name: /LISBOA, TINY TRAM/ })).toBeVisible()
   await expect(page.getByText('Route by A player')).toBeVisible()
@@ -96,11 +96,11 @@ test('add a route someone else made, from a link', async ({ page, context }) => 
   await page.getByRole('button', { name: '3', exact: true }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Arco da Rua Augusta' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Portuguese words' })).toBeVisible()
-  await expect.poll(() => images).toEqual(['https://routes.example.org/lisbon-tiny/images/arch.jpg'])
+  await expect.poll(() => [...new Set(images)]).toEqual(['https://routes.example.org/lisbon-tiny/images/arch.jpg'])
 
   // Still there after a reload, without the link.
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: '1 route in Lisboa' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Explore Lisboa' })).toBeVisible()
 })
 
 test('a broken route file is refused with the reason', async ({ page, context }) => {

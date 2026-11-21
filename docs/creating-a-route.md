@@ -58,6 +58,7 @@ The full, always-current definition is `web/src/engine/schema.ts`, exported as `
 | `language` | no | What the route is written in (default `en`); sets the read-aloud voice |
 | `localLanguage` | no | `{ "code": "pt", "name": "Portuguese" }`, which titles the words section |
 | `theme` | no | `{ "colors": ["#006600", "#ffcc00"] }`, the badge's outer and band colours, also used for the confetti |
+| `cover` | no | The photo on route cards and the preview (same shape as a lesson photo). Defaults to the first stop's photo |
 | `region` | no | Shown in the city list, e.g. `"Castilla-La Mancha"` |
 | `kind` | no | Short label on the route card, e.g. `"Classic"` or `"Neighbourhood"`. With 4 or more routes in a city, the list can be filtered by it |
 | `country`, `author` | no | `"PT"`, `{ "name": "…", "url": "https://…" }`. An author other than City Quest is credited on the route preview |

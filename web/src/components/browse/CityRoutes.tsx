@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { badgesIn, routeStatus, type City } from '../../lib/cities'
 import type { EarnedBadge, Session } from '../../lib/session'
 import type { Route } from '../../types'
+import { IconChevron } from '../icons'
 import { RouteCard } from './RouteCard'
 
 const FILTERS_FROM = 4
@@ -13,10 +14,10 @@ export function CityRoutes({ city, badges, session, onOpen, onBack }: { city: Ci
   const shown = city.routes.filter((r) => !kind || r.kind === kind)
   const n = city.routes.length
   return (
-    <main className="home browse">
+    <main className="home browse enter">
       <header className="sub-head">
         <button className="round" onClick={onBack} aria-label="Back">
-          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
+          <IconChevron dir="left" size={18} />
         </button>
         <div>
           <h1>{city.name}</h1>

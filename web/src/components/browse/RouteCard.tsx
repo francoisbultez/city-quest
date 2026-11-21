@@ -2,32 +2,46 @@ import { routeKm } from '../../lib/route'
 import type { RouteStatus } from '../../lib/cities'
 import type { Route } from '../../types'
 import { Badge } from '../Badge'
+import { IconClock, IconFlag, IconWalk, Stars } from '../icons'
+import { Cover } from './Cover'
 
-function StatusLine({ status }: { status: RouteStatus }) {
-  if (status.kind === 'progress') return <span className="status progress">In progress · stop {status.stop} of {status.total}</span>
+export function StatusLine({ status }: { status: RouteStatus }) {
+  if (status.kind === 'progress')
+    return (
+      <span className="status progress">
+        <span className="bar" aria-hidden="true"><i style={{ width: `${(100 * (status.stop - 1)) / status.total}%` }} /></span>
+        Stop {status.stop} of {status.total}
+      </span>
+    )
   if (status.kind === 'earned')
     return (
       <span className="status earned">
-        <span aria-label={`${status.stars} of 3 stars`}>{'★'.repeat(status.stars)}<i>{'★'.repeat(3 - status.stars)}</i></span> Your best: {status.points} points
+        <Stars n={status.stars} /> Best {status.points} pts
       </span>
     )
-  return <span className="status new">Not played yet</span>
+  return <span className="status new">New</span>
 }
 
-/** A route as a card: big for the home carousel, compact for lists. */
+export function RouteFacts({ route }: { route: Route }) {
+  return (
+    <span className="facts">
+      <span><IconWalk />{routeKm(route.stops).toFixed(1)} km</span>
+      <span><IconClock />{route.duration.replace(/^~/, '')}</span>
+      <span><IconFlag />{route.stops.length} stops</span>
+    </span>
+  )
+}
+
+/** A route as a card: a big photo card for the home carousel, a row for lists. */
 export function RouteCard({ route, status, onOpen, compact = false }: { route: Route; status: RouteStatus; onOpen: () => void; compact?: boolean }) {
-  const meta = [`${routeKm(route.stops).toFixed(1)} km`, route.duration, `${route.stops.length} stops`]
   if (compact) {
     return (
-      <button className="route-row" onClick={onOpen}>
-        <Badge size={72} route={route} label="" />
+      <button className="route-row" onClick={onOpen} aria-label={`${route.name}: ${route.tagline}`}>
+        <Cover route={route} className="thumb" />
         <span className="txt">
-          <span className="name">
-            <b>{route.name}</b>
-            {route.kind && <span className="kind">{route.kind}</span>}
-          </span>
-          <span className="tagline">{route.tagline}</span>
-          <span className="meta">{meta.join(' · ')}</span>
+          {route.kind && <span className="eyebrow">{route.kind}</span>}
+          <b>{route.name}</b>
+          <RouteFacts route={route} />
           <StatusLine status={status} />
         </span>
       </button>
@@ -35,18 +49,19 @@ export function RouteCard({ route, status, onOpen, compact = false }: { route: R
   }
   return (
     <button className="route-tile" onClick={onOpen} aria-label={`${route.name}: ${route.tagline}`}>
-      <span className="top">
-        <Badge size={96} route={route} label="" />
-        {route.kind && <span className="kind">{route.kind}</span>}
+      <span className="photo">
+        <Cover route={route} />
+        {route.kind && <span className="pill on-photo">{route.kind}</span>}
+        <span className="tile-badge"><Badge size={64} route={route} label="" /></span>
       </span>
-      <span className="name">{route.name}</span>
-      <span className="tagline">{route.tagline}</span>
-      <span className="chips">
-        {meta.map((m) => (
-          <span key={m} className="chip">{m}</span>
-        ))}
+      <span className="body">
+        <b className="name">{route.name}</b>
+        <span className="tagline">{route.tagline}</span>
+        <span className="foot">
+          <RouteFacts route={route} />
+          <StatusLine status={status} />
+        </span>
       </span>
-      <StatusLine status={status} />
     </button>
   )
 }
